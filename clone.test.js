@@ -195,22 +195,15 @@ describe('true clone', () => {
 
   it('handles getters', () => {
 
-    class Pair {
-      constructor(left, right) {
-        this.left = left;
-        this.right = right;
-      }
+    const obj = {};
+    Object.defineProperty(obj, 'getter', {
+      get() { return 'got'; }
+    });
 
-      get string() {
-        return `(${this.left}, ${this.right})`;
-      }
-    }
+    const obj_c = clone(obj);
 
-    const pair = new Pair(3, 4);
-    const pair_c = clone(pair);
-
-    expect(pair_c).toStrictEqual(pair);
-    expect(pair_c.string).toBe('(3, 4)');
+    expect(obj_c).toStrictEqual(obj);
+    expect(obj_c.getter).toBe('got');
 
   });
 

@@ -50,8 +50,15 @@ function clone(source) {
       const result = Object.create(Object.getPrototypeOf(source));
       cache.set(source, result);
 
+      const descriptors = Object.getOwnPropertyDescriptors(source);
       for (const key of Reflect.ownKeys(source)) {
-        result[key] = inner(source[key]);
+        const descriptor = descriptors[key];
+        if (descriptor.get || descriptor.set) {
+          Object.defineProperty(result, key, descriptor);
+        } else {
+          const cloned_value = inner(descriptor.value);
+          Object.defineProperty(result, key, { ...descriptor, value: cloned_value });
+        }
       }
       return result;
 
