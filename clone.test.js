@@ -37,6 +37,15 @@ describe('true clone', () => {
     expect(clone(-100n)).toStrictEqual(-100n);
   });
 
+  it('handles Number objects', () => {
+    const number = new Number(3.14);
+    number.my = 'prop';
+    const number_c = clone(number);
+    expect(+number_c).toBe(3.14);
+    expect(number_c.my).toBe('prop');
+    expect(Object.is(number_c, number)).toBe(false);
+  });
+
   it('handles strings', () => {
     expect(clone('')).toBe('');
     expect(clone('string')).toBe('string');
@@ -69,15 +78,30 @@ describe('true clone', () => {
     expect(nested_c).not.toBe(nested);
     for (let i = 0; i < nested.length; i++)
       expect(nested_c[i]).not.toBe(nested[i]);
+
+    const custom = [3, 1, 4];
+    custom.my = 'prop';
+    const custom_c = clone(custom);
+    expect(custom_c).toStrictEqual(custom);
+    expect(custom_c).not.toBe(custom);
+    expect(custom_c.my).toStrictEqual(custom.my);
   });
 
   it('handles Map objects', () => {
     const map = new Map();
     map.set([], 'empty');
     map.set([1, 2, 3], 'counting')
-
     const map_c = clone(map);
     expect(map_c).toStrictEqual(map);
+    expect(map_c).not.toBe(map);
+
+    const custom = new Map();
+    map.set('ping', 'pong');
+    map.my = 'prop';
+    const custom_c = clone(custom);
+    expect(custom_c).toStrictEqual(custom);
+    expect(custom_c).not.toBe(custom);
+    expect(custom_c.my).toStrictEqual(custom.my);
   });
 
   it('handles simple objects', () => {
