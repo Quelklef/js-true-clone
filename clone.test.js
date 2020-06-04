@@ -1,6 +1,42 @@
 
 const { clone } = require('./clone.js');
 
+function testCustomProps(get_uncloned) {
+  it('with custom properties', () => {
+    const uncloned = get_uncloned();
+    uncloned.my = 'prop';
+    const cloned = clone(uncloned);
+    expect(cloned).toStrictEqual(uncloned);
+    expect(cloned).not.toBe(uncloned);
+    expect(cloned.my).toStrictEqual(uncloned.my);
+    cloned.my = 'different';
+    expect(cloned.my).not.toStrictEqual(uncloned.my);
+  });
+}
+
+function testTypedArray(constructor, sample_value) {
+  it('empty', () => {
+    const array = new constructor(100);
+    const array_c = clone(array);
+    expect(array_c).toStrictEqual(array);
+    expect(array_c).not.toBe(array);
+  });
+
+  it('nonempty', () => {
+    const array = new constructor(100);
+    array[0] = sample_value;
+    const array_c = clone(array);
+    expect(array_c).toStrictEqual(array);
+    expect(array_c).not.toBe(array);
+  });
+
+  testCustomProps(() => {
+    const array = new constructor(100);
+    array[0] = sample_value;
+    return array;
+  });
+}
+
 describe('true clone', () => {
 
   describe('primitives', () => {
@@ -67,14 +103,7 @@ describe('true clone', () => {
           expect(nested_c[i]).not.toBe(nested[i]);
       });
 
-      it('with custom properties', () => {
-        const custom = [3, 1, 4];
-        custom.my = 'prop';
-        const custom_c = clone(custom);
-        expect(custom_c).toStrictEqual(custom);
-        expect(custom_c).not.toBe(custom);
-        expect(custom_c.my).toStrictEqual(custom.my);
-      });
+      testCustomProps(() => [3, 1, 4]);
 
       it('with self-reference', () => {
         const array = [0, 1, 2];
@@ -94,9 +123,13 @@ describe('true clone', () => {
       expect(clone(-100n)).toStrictEqual(-100n);
     });
 
-    it('BigInt64Array', () => { });
+    describe('BigInt64Array', () => {
+      testTypedArray(BigInt64Array, 12n);
+    });
 
-    it('BigIntU64Array', () => { });
+    describe('BigUint64Array', () => {
+      testTypedArray(BigUint64Array, 12n);
+    });
 
     it('Boolean', () => { });
 
@@ -104,20 +137,30 @@ describe('true clone', () => {
 
     it('Date', () => { });
 
-    it('Float32Array', () => { });
+    describe('Float32Array', () => {
+      testTypedArray(Float32Array, 3.14);
+    });
 
-    it('Float64Array', () => { });
+    describe('Float64Array', () => {
+      testTypedArray(Float64Array, 3.14);
+    });
 
     it('Function', () => {
       const f = () => {};
       expect(clone(f)).toBe(f);
     });
 
-    it('Int8Array', () => { });
+    describe('Int8Array', () => {
+      testTypedArray(Int8Array, 12);
+    });
 
-    it('Int16Array', () => { });
+    describe('Int16Array', () => {
+      testTypedArray(Int16Array, 12);
+    });
 
-    it('Int32Array', () => { })
+    describe('Int32Array', () => {
+      testTypedArray(Int32Array, 12);
+    });
 
     describe('Map', () => {
 
@@ -130,25 +173,24 @@ describe('true clone', () => {
         expect(map_c).not.toBe(map);
       });
 
-      it('with custom properties', () => {
+      testCustomProps(() => {
         const custom = new Map();
         custom.set('ping', 'pong');
-        custom.my = 'prop';
-        const custom_c = clone(custom);
-        expect(custom_c).toStrictEqual(custom);
-        expect(custom_c).not.toBe(custom);
-        expect(custom_c.my).toStrictEqual(custom.my);
+        return custom;
       });
 
     });
 
-    it('Number', () => {
-      const number = new Number(3.14);
-      number.my = 'prop';
-      const number_c = clone(number);
-      expect(+number_c).toBe(3.14);
-      expect(number_c.my).toBe('prop');
-      expect(Object.is(number_c, number)).toBe(false);
+    describe('Number', () => {
+      it('simple', () => {
+        const number = new Number(3.14);
+        number.my = 'prop';
+        const number_c = clone(number);
+        expect(+number_c).toBe(3.14);
+        expect(Object.is(number_c, number)).toBe(false);
+      });
+
+      testCustomProps(() => new Number(3.14));
     });
 
     it('Promise', () => { });
@@ -168,13 +210,21 @@ describe('true clone', () => {
       expect(clone(s)).toBe(s);
     });
 
-    it('Uint8Array', () => { });
+    describe('Uint8Array', () => {
+      testTypedArray(Uint8Array, 12);
+    });
 
-    it('Uint8ClampedArray', () => { });
+    describe('Uint8ClampedArray', () => {
+      testTypedArray(Uint8ClampedArray, 12);
+    });
 
-    it('Uint16Array', () => { });
+    describe('Uint16Array', () => {
+      testTypedArray(Uint16Array, 12);
+    });
 
-    it('Uint32Array', () => { });
+    describe('Uint32Array', () => {
+      testTypedArray(Uint32Array, 12);
+    });
 
     it('WeakMap', () => { });
 

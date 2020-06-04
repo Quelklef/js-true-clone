@@ -40,9 +40,15 @@ cloners.set(BigInt.prototype, function(source, cache, clone) {
 });
 
 cloners.set(BigInt64Array.prototype, function(source, cache, clone) {
+  const result = new BigInt64Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(BigUint64Array.prototype, function(source, cache, clone) {
+  const result = new BigUint64Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Boolean.prototype, function(source, cache, clone) {
@@ -57,9 +63,15 @@ cloners.set(Date.prototype, function(source, cache, clone) {
 });
 
 cloners.set(Float32Array.prototype, function(source, cache, clone) {
+  const result = new Float32Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Float64Array.prototype, function(source, cache, clone) {
+  const result = new Float64Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Function.prototype, function(source, cache, clone) {
@@ -68,12 +80,21 @@ cloners.set(Function.prototype, function(source, cache, clone) {
 });
 
 cloners.set(Int8Array.prototype, function(source, cache, clone) {
+  const result = new Int8Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Int16Array.prototype, function(source, cache, clone) {
+  const result = new Int16Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Int32Array.prototype, function(source, cache, clone) {
+  const result = new Int32Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Map.prototype, function(source, cache, clone) {
@@ -124,15 +145,27 @@ cloners.set(Symbol.prototype, function(source, cache, clone) {
 });
 
 cloners.set(Uint8Array.prototype, function(source, cache, clone) {
+  const result = new Uint8Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Uint8ClampedArray.prototype, function(source, cache, clone) {
+  const result = new Uint8ClampedArray(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Uint16Array.prototype, function(source, cache, clone) {
+  const result = new Uint16Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Uint32Array.prototype, function(source, cache, clone) {
+  const result = new Uint32Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(WeakMap.prototype, function(source, cache, clone) {
