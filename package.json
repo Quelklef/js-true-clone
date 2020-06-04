@@ -1,0 +1,31 @@
+{
+  "name": "true-clone",
+  "version": "0.1.0",
+  "description": "A deep cloning algorithm aware of prototypes, getters/setters, etc.",
+  "main": "clone.js",
+  "scripts": {
+    "test": "npx jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quelklef/true-clone.git"
+  },
+  "keywords": [
+    "deep",
+    "clone",
+    "copy",
+    "recursive",
+    "prototype",
+    "getter",
+    "setter"
+  ],
+  "author": "Quelklef",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Quelklef/true-clone/issues"
+  },
+  "homepage": "https://github.com/Quelklef/true-clone#readme",
+  "devDependencies": {
+    "jest": "^26.0.1"
+  }
+}
