@@ -32,9 +32,9 @@ describe('true clone', () => {
   });
 
   it('handles big ints', () => {
-    expect(clone(0n)).toEqual(0n);
-    expect(clone(100n)).toEqual(100n);
-    expect(clone(-100n)).toEqual(-100n);
+    expect(clone(0n)).toStrictEqual(0n);
+    expect(clone(100n)).toStrictEqual(100n);
+    expect(clone(-100n)).toStrictEqual(-100n);
   });
 
   it('handles strings', () => {
@@ -55,17 +55,17 @@ describe('true clone', () => {
   it('handles arrays', () => {
     const empty = [];
     const empty_c = clone(empty);
-    expect(empty_c).toEqual(empty);
+    expect(empty_c).toStrictEqual(empty);
     expect(empty_c).not.toBe(empty);
 
     const nonempty = [1, 2, 3];
     const nonempty_c = clone(nonempty);
-    expect(nonempty_c).toEqual(nonempty);
+    expect(nonempty_c).toStrictEqual(nonempty);
     expect(nonempty_c).not.toBe(nonempty);
 
     const nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
     const nested_c = clone(nested);
-    expect(nested_c).toEqual(nested);
+    expect(nested_c).toStrictEqual(nested);
     expect(nested_c).not.toBe(nested);
     for (let i = 0; i < nested.length; i++)
       expect(nested_c[i]).not.toBe(nested[i]);
@@ -74,17 +74,17 @@ describe('true clone', () => {
   it('handles simple objects', () => {
     const empty = {};
     const empty_c = clone(empty);
-    expect(empty_c).toEqual(empty);
+    expect(empty_c).toStrictEqual(empty);
     expect(empty_c).not.toBe(empty);
 
     const nonempty = { left: 'right', up: 'down', red: 'blue' };
     const nonempty_c = clone(nonempty);
-    expect(nonempty_c).toEqual(nonempty);
+    expect(nonempty_c).toStrictEqual(nonempty);
     expect(nonempty_c).not.toBe(nonempty);
 
     const nested = { child: { val: 'val!' } };
     const nested_c = clone(nested);
-    expect(nested_c).toEqual(nested);
+    expect(nested_c).toStrictEqual(nested);
     expect(nested_c).not.toBe(nested);
     expect(nested_c.child).not.toBe(nested.child);
   });
@@ -93,13 +93,13 @@ describe('true clone', () => {
     const array = [0, 1, 2];
     array[1] = array;
     const array_c = clone(array);
-    expect(array_c).toEqual(array);
+    expect(array_c).toStrictEqual(array);
     expect(array_c[1]).toBe(array_c);
 
     const object = { prop: 'val' };
     object.self = object;
     const object_c = clone(object);
-    expect(object_c).toEqual(object);
+    expect(object_c).toStrictEqual(object);
     expect(object_c.self).toBe(object_c);
   });
 
