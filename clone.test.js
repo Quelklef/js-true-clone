@@ -13,11 +13,6 @@ describe('true clone', () => {
       expect(clone(undefined)).toBe(undefined);
     });
 
-    it('symbols', () => {
-      const s = Symbol('s');
-      expect(clone(s)).toBe(s);
-    });
-
     it('nice numbers', () => {
       expect(clone(1)).toBe(1);
       expect(clone(-1)).toBe(-1);
@@ -46,26 +41,6 @@ describe('true clone', () => {
   });
 
   describe('special types', () => {
-
-    it('BigInt', () => {
-      expect(clone(0n)).toStrictEqual(0n);
-      expect(clone(100n)).toStrictEqual(100n);
-      expect(clone(-100n)).toStrictEqual(-100n);
-    });
-
-    describe('Number', () => {
-      const number = new Number(3.14);
-      number.my = 'prop';
-      const number_c = clone(number);
-      expect(+number_c).toBe(3.14);
-      expect(number_c.my).toBe('prop');
-      expect(Object.is(number_c, number)).toBe(false);
-    });
-
-    it('Function', () => {
-      const f = () => {};
-      expect(clone(f)).toBe(f);
-    });
 
     describe('Array', () => {
 
@@ -111,6 +86,39 @@ describe('true clone', () => {
 
     });
 
+    it('ArrayBuffer', () => { });
+
+    it('BigInt', () => {
+      expect(clone(0n)).toStrictEqual(0n);
+      expect(clone(100n)).toStrictEqual(100n);
+      expect(clone(-100n)).toStrictEqual(-100n);
+    });
+
+    it('BigInt64Array', () => { });
+
+    it('BigIntU64Array', () => { });
+
+    it('Boolean', () => { });
+
+    it('DataView', () => { });
+
+    it('Date', () => { });
+
+    it('Float32Array', () => { });
+
+    it('Float64Array', () => { });
+
+    it('Function', () => {
+      const f = () => {};
+      expect(clone(f)).toBe(f);
+    });
+
+    it('Int8Array', () => { });
+
+    it('Int16Array', () => { });
+
+    it('Int32Array', () => { })
+
     describe('Map', () => {
 
       it('nonempty', () => {
@@ -133,6 +141,58 @@ describe('true clone', () => {
       });
 
     });
+
+    it('Number', () => {
+      const number = new Number(3.14);
+      number.my = 'prop';
+      const number_c = clone(number);
+      expect(+number_c).toBe(3.14);
+      expect(number_c.my).toBe('prop');
+      expect(Object.is(number_c, number)).toBe(false);
+    });
+
+    it('Promise', () => { });
+
+    it('Proxy', () => { });
+
+    it('RegExp', () => { });
+
+    it('Set', () => { });
+
+    it('SharedArrayBuffer', () => { });
+
+    it('String', () => { });
+
+    it('Symbol', () => {
+      const s = Symbol('s');
+      expect(clone(s)).toBe(s);
+    });
+
+    it('Uint8Array', () => { });
+
+    it('Uint8ClampedArray', () => { });
+
+    it('Uint16Array', () => { });
+
+    it('Uint32Array', () => { });
+
+    it('WeakMap', () => { });
+
+    it('WeakSet', () => { });
+
+    it('Error', () => { });
+
+    it('EvalError', () => { });
+
+    it('RangeError', () => { });
+
+    it('ReferenceError', () => { });
+
+    it('SyntaxError', () => { });
+
+    it('TypeError', () => { });
+
+    it('URIError', () => { });
 
   });
 
