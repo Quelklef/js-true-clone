@@ -24,7 +24,8 @@ function clone(source) {
     if (cache.has(source))
       return cache.get(source);
 
-    // handle arrays
+    // Arrays are exotic objects (see https://tc39.es/ecma262/#sec-array-exotic-objects)
+    // and so must be handled specially
     if (source instanceof Array) {
 
       const result = new Array(source.length);
@@ -34,7 +35,8 @@ function clone(source) {
       }
       return result;
 
-    // handle maps
+    // Maps have an internal [[MapData]] slot (see e.g. https://tc39.es/ecma262/#sec-map.prototype.clear)
+    // and so must be handled specially
     } else if (source instanceof Map) {
 
       const result = new Map();

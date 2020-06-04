@@ -52,7 +52,7 @@ describe('true clone', () => {
     expect(clone(f)).toBe(f);
   });
 
-  it('handles arrays', () => {
+  it('handles Array objects', () => {
     const empty = [];
     const empty_c = clone(empty);
     expect(empty_c).toStrictEqual(empty);
@@ -71,7 +71,7 @@ describe('true clone', () => {
       expect(nested_c[i]).not.toBe(nested[i]);
   });
 
-  it('handles maps', () => {
+  it('handles Map objects', () => {
     const map = new Map();
     map.set([], 'empty');
     map.set([1, 2, 3], 'counting')
