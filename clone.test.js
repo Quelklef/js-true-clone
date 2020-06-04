@@ -123,6 +123,24 @@ describe('true clone', () => {
 
   });
 
+  it('handles objects with prototype from Object.create', () => {
+
+    const proto = {
+      delimiter: ', ',
+      toString() {
+        return this.items.join(this.delimiter);
+      }
+    };
+
+    const object = Object.create(proto);
+    object.items = [1, 2, 3];
+
+    const object_c = clone(object);
+    expect(object_c).toStrictEqual(object);
+    expect(object_c.toString()).toStrictEqual('1, 2, 3');
+
+  });
+
   it('handles ES6 class instances with no hierarchy', () => {
 
     class Pair {

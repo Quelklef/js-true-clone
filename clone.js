@@ -39,7 +39,8 @@ function clone(source) {
 
       const result = Object.create(Object.getPrototypeOf(source));
       cache.set(source, result);
-      for (const key in source) {
+
+      for (const key of Reflect.ownKeys(source)) {
         result[key] = inner(source[key]);
       }
       return result;
