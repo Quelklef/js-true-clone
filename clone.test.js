@@ -89,4 +89,25 @@ describe('true clone', () => {
     expect(nested_c.child).not.toBe(nested.child);
   });
 
+  it('handles cyclic structures', () => {
+    const array = [0, 1, 2];
+    array[1] = array;
+    const array_c = clone(array);
+    expect(array_c).toEqual(array);
+    expect(array_c[1]).toBe(array_c);
+
+    const object = { prop: 'val' };
+    object.self = object;
+    const object_c = clone(object);
+    expect(object_c).toEqual(object);
+    expect(object_c.self).toBe(object_c);
+  });
+
+  it('handles tricky reference structures', () => {
+    const target = { i_am: 'target' };
+    const object = { first_ref: target, second_ref: target };
+    const object_c = clone(object);
+    expect(object_c.first_ref).toBe(object_c.second_ref);
+  });
+
 });
