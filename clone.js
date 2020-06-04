@@ -24,7 +24,7 @@ function clone(source) {
     if (cache.has(source))
       return cache.get(source);
 
-    // handle arrays specially
+    // handle arrays
     if (source instanceof Array) {
 
       const result = new Array(source.length);
@@ -34,7 +34,17 @@ function clone(source) {
       }
       return result;
 
-    // plain objects
+    // handle maps
+    } else if (source instanceof Map) {
+
+      const result = new Map();
+      cache.set(source, result);
+      for (const [key, val] of source.entries()) {
+        result.set(key, val);
+      }
+      return result;
+
+    // handle plain objects
     } else {
 
       const result = Object.create(Object.getPrototypeOf(source));

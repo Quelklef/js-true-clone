@@ -71,6 +71,15 @@ describe('true clone', () => {
       expect(nested_c[i]).not.toBe(nested[i]);
   });
 
+  it('handles maps', () => {
+    const map = new Map();
+    map.set([], 'empty');
+    map.set([1, 2, 3], 'counting')
+
+    const map_c = clone(map);
+    expect(map_c).toStrictEqual(map);
+  });
+
   it('handles simple objects', () => {
     const empty = {};
     const empty_c = clone(empty);
