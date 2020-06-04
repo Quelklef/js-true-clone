@@ -89,6 +89,13 @@ describe('true clone', () => {
     expect(nested_c.child).not.toBe(nested.child);
   });
 
+  it('handles objects with non-string keys', () => {
+    const sym = Symbol();
+    const funky = { [sym]: 'sym', str: 'str' };
+    const funky_c = clone(funky);
+    expect(funky_c).toStrictEqual(funky);
+  });
+
   it('handles cyclic structures', () => {
     const array = [0, 1, 2];
     array[1] = array;
