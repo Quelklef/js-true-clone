@@ -159,4 +159,25 @@ describe('true clone', () => {
 
   });
 
+  it('handles getters', () => {
+
+    class Pair {
+      constructor(left, right) {
+        this.left = left;
+        this.right = right;
+      }
+
+      get string() {
+        return `(${this.left}, ${this.right})`;
+      }
+    }
+
+    const pair = new Pair(3, 4);
+    const pair_c = clone(pair);
+
+    expect(pair_c).toStrictEqual(pair);
+    expect(pair_c.string).toBe('(3, 4)');
+
+  });
+
 });
