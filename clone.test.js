@@ -110,4 +110,53 @@ describe('true clone', () => {
     expect(object_c.first_ref).toBe(object_c.second_ref);
   });
 
+  it('handles function prototype instances with no hierarchy', () => {
+
+    function Pair(left, right) {
+      this.left = left;
+      this.right = right;
+    }
+
+    const pair = new Pair(3, 4);
+    const pair_c = clone(pair);
+    expect(pair_c).toStrictEqual(pair);
+
+  });
+
+  it('handles ES6 class instances with no hierarchy', () => {
+
+    class Pair {
+      constructor(left, right) {
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    const pair = new Pair(3, 4);
+    const pair_c = clone(pair);
+    expect(pair_c).toStrictEqual(pair);
+
+  });
+
+  it('handles ES6 classes with hierarchy', () => {
+
+    class Parent {
+      constructor(p_val) {
+        this.p_val = p_val;
+      }
+    }
+
+    class Child extends Parent {
+      constructor(p_val, c_val) {
+        super(p_val);
+        this.c_val = c_val;
+      }
+    }
+
+    const child = new Child('p_val', 'c_val');
+    const child_c = clone(child);
+    expect(child_c).toStrictEqual(child);
+
+  });
+
 });

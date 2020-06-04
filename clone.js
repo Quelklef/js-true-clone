@@ -37,7 +37,7 @@ function clone(source) {
     // plain objects
     } else {
 
-      const result = {};
+      const result = Object.create(Object.getPrototypeOf(source));
       cache.set(source, result);
       for (const key in source) {
         result[key] = inner(source[key]);
