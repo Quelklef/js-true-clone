@@ -1,7 +1,171 @@
 
-module.exports = { clone };
+module.exports = { clone: outer_clone };
 
-function clone(source) {
+// Copy properties from `source` to `result`
+function mirror(source, result, clone) {
+  const descriptors = Object.getOwnPropertyDescriptors(source);
+  for (const key of Reflect.ownKeys(source)) {
+    const descriptor = descriptors[key];
+    if (descriptor.get || descriptor.set) {
+      Object.defineProperty(result, key, descriptor);
+    } else {
+      const cloned_value = clone(descriptor.value);
+      Object.defineProperty(result, key, { ...descriptor, value: cloned_value });
+    }
+  }
+}
+
+// Some types must be handled specially
+// (For instance if they have any internal slots)
+// I've taken this list from the list of well-known intrinsic objects (https://tc39.es/ecma262/#sec-well-known-intrinsic-objects)
+// This may be overkill, but it will probably handle all needed cases
+const cloners = new Map();
+
+cloners.set(Array.prototype, function(source, cache, clone) {
+  const result = new Array(source.length);
+  cache.set(source, result);
+  mirror(source, result, clone);
+  for (let i = 0; i < source.length; i++) {
+    result[i] = clone(source[i]);
+  }
+  return result;
+});
+
+cloners.set(ArrayBuffer.prototype, function(source, cache, clone) {
+});
+
+cloners.set(BigInt.prototype, function(source, cache, clone) {
+  // BigInt objects appear to be immutable
+  return source;
+});
+
+cloners.set(BigInt64Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(BigUint64Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Boolean.prototype, function(source, cache, clone) {
+  // Boolean objects appear to be immutable
+  return source;
+});
+
+cloners.set(DataView.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Date.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Float32Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Float64Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Function.prototype, function(source, cache, clone) {
+  // Functions are mutable but cannot be cloned :(
+  return source;
+});
+
+cloners.set(Int8Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Int16Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Int32Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Map.prototype, function(source, cache, clone) {
+  const result = new Map();
+  cache.set(source, result);
+  mirror(source, result, clone);
+  for (const [key, val] of source.entries()) {
+    result.set(key, val);
+  }
+  return result;
+});
+
+cloners.set(Number.prototype, function(source, cache, clone) {
+  const result = new Number(source);
+  cache.set(source, result);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Object.prototype, function(source, cache, clone) {
+  const result = {};
+  cache.set(source, result);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Promise.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Proxy.prototype, function(source, cache, clone) {
+});
+
+cloners.set(RegExp.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Set.prototype, function(source, cache, clone) {
+});
+
+cloners.set(SharedArrayBuffer.prototype, function(source, cache, clone) {
+});
+
+cloners.set(String.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Symbol.prototype, function(source, cache, clone) {
+  // Symbols are immutable: https://tc39.es/ecma262/#sec-ecmascript-language-types-symbol-type
+  return source;
+});
+
+cloners.set(Uint8Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Uint8ClampedArray.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Uint16Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(Uint32Array.prototype, function(source, cache, clone) {
+});
+
+cloners.set(WeakMap.prototype, function(source, cache, clone) {
+});
+
+cloners.set(WeakSet.prototype, function(source, cache, clone) {
+});
+
+// == ERRORS == //
+
+cloners.set(Error.prototype, function(source, cache, clone) {
+});
+
+cloners.set(EvalError.prototype, function(source, cache, clone) {
+});
+
+cloners.set(RangeError.prototype, function(source, cache, clone) {
+});
+
+cloners.set(ReferenceError.prototype, function(source, cache, clone) {
+});
+
+cloners.set(SyntaxError.prototype, function(source, cache, clone) {
+});
+
+cloners.set(TypeError.prototype, function(source, cache, clone) {
+});
+
+cloners.set(URIError.prototype, function(source, cache, clone) {
+});
+
+
+function outer_clone(source) {
 
   // We want to preserve correct structure in objects with tricky references,
   // e.g. cyclic structures or structures with two references to the same object.
@@ -10,60 +174,35 @@ function clone(source) {
   // Note that we only store certiain values, like Arrays or plain object
   const cache = new WeakMap();
 
-  return inner(source);
+  return clone(source);
 
   // Actual algorithm implementation
-  function inner(source) {
+  function clone(source) {
 
-    // non-objects and null are immutable and may be returned as-is
-    if (typeof source !== 'object' || source === null) {
+    if (
+      source === null
+      || source === undefined
+      || typeof source === 'boolean'
+      || typeof source === 'number'
+      || typeof source === 'string'
+    ) {
       return source;
     }
 
     // return early on cache hit
-    if (cache.has(source))
+    if (cache.has(source)) {
       return cache.get(source);
+    }
 
-    // Arrays are exotic objects (see https://tc39.es/ecma262/#sec-array-exotic-objects)
-    // and so must be handled specially
-    if (source instanceof Array) {
-
-      const result = new Array(source.length);
+    const prototype = Object.getPrototypeOf(source);
+    if (cloners.has(prototype)) {
+      const cloner = cloners.get(prototype);
+      return cloner(source, cache, clone);
+    } else {  // custom type
+      const result = Object.create(prototype);
       cache.set(source, result);
-      for (let i = 0; i < source.length; i++) {
-        result[i] = inner(source[i]);
-      }
+      mirror(source, result, clone);
       return result;
-
-    // Maps have an internal [[MapData]] slot (see e.g. https://tc39.es/ecma262/#sec-map.prototype.clear)
-    // and so must be handled specially
-    } else if (source instanceof Map) {
-
-      const result = new Map();
-      cache.set(source, result);
-      for (const [key, val] of source.entries()) {
-        result.set(key, val);
-      }
-      return result;
-
-    // handle plain objects
-    } else {
-
-      const result = Object.create(Object.getPrototypeOf(source));
-      cache.set(source, result);
-
-      const descriptors = Object.getOwnPropertyDescriptors(source);
-      for (const key of Reflect.ownKeys(source)) {
-        const descriptor = descriptors[key];
-        if (descriptor.get || descriptor.set) {
-          Object.defineProperty(result, key, descriptor);
-        } else {
-          const cloned_value = inner(descriptor.value);
-          Object.defineProperty(result, key, { ...descriptor, value: cloned_value });
-        }
-      }
-      return result;
-
     }
 
   }

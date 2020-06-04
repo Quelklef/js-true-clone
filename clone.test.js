@@ -110,20 +110,20 @@ describe('true clone', () => {
     array[1] = array;
     const array_c = clone(array);
     expect(array_c).toStrictEqual(array);
-    expect(array_c[1]).toBe(array_c);
+    expect(Object.is(array_c[1], array_c)).toBe(true);
 
     const object = { prop: 'val' };
     object.self = object;
     const object_c = clone(object);
     expect(object_c).toStrictEqual(object);
-    expect(object_c.self).toBe(object_c);
+    expect(Object.is(object_c.self, object_c)).toBe(true);
   });
 
   it('handles tricky reference structures', () => {
     const target = { i_am: 'target' };
     const object = { first_ref: target, second_ref: target };
     const object_c = clone(object);
-    expect(object_c.first_ref).toBe(object_c.second_ref);
+    expect(Object.is(object_c.first_ref, object_c.second_ref)).toBe(true);
   });
 
   it('handles function prototype instances with no hierarchy', () => {
