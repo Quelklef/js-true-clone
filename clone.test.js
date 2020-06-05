@@ -191,10 +191,6 @@ describe('true clone', () => {
       testCustomProps(() => new Number(3.14));
     });
 
-    it('Promise', () => { });
-
-    it('Proxy', () => { });
-
     it('RegExp', () => { });
 
     describe('Set', () => {

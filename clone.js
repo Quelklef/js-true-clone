@@ -121,12 +121,6 @@ cloners.set(Object.prototype, function(source, cache, clone) {
   return result;
 });
 
-cloners.set(Promise.prototype, function(source, cache, clone) {
-});
-
-cloners.set(Proxy.prototype, function(source, cache, clone) {
-});
-
 cloners.set(RegExp.prototype, function(source, cache, clone) {
 });
 
