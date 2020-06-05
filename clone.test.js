@@ -135,7 +135,15 @@ describe('true clone', () => {
 
     it('DataView', () => { });
 
-    it('Date', () => { });
+    describe('Date', () => {
+      it('simple', () => {
+        const now = new Date();
+        const now_c = clone(now);
+        expect(now_c).toStrictEqual(now);
+      });
+
+      testCustomProps(() => new Date());
+    });
 
     describe('Float32Array', () => {
       testTypedArray(Float32Array, 3.14);

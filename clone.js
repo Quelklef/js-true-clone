@@ -60,6 +60,17 @@ cloners.set(DataView.prototype, function(source, cache, clone) {
 });
 
 cloners.set(Date.prototype, function(source, cache, clone) {
+  const result = new Date(
+    source.getFullYear(),
+    source.getMonth(),
+    source.getDate(),
+    source.getHours(),
+    source.getMinutes(),
+    source.getSeconds(),
+    source.getMilliseconds(),
+  );
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Float32Array.prototype, function(source, cache, clone) {
