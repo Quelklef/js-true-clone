@@ -229,24 +229,45 @@ cloners.set(Uint32Array.prototype, function(source, cache, clone) {
 // == ERRORS == //
 
 cloners.set(Error.prototype, function(source, cache, clone) {
+  const result = new Error(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(EvalError.prototype, function(source, cache, clone) {
+  const result = new EvalError(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(RangeError.prototype, function(source, cache, clone) {
+  const result = new RangeError(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(ReferenceError.prototype, function(source, cache, clone) {
+  const result = new ReferenceError(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(SyntaxError.prototype, function(source, cache, clone) {
+  const result = new SyntaxError(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(TypeError.prototype, function(source, cache, clone) {
+  const result = new TypeError(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(URIError.prototype, function(source, cache, clone) {
+  const result = new URIError(source.message, source.fileName, source.lineNumber);
+  mirror(source, result, clone);
+  return result;
 });
 
 

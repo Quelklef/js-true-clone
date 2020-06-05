@@ -303,19 +303,45 @@ describe('true clone', () => {
 
     // == ERRORS == //
 
-    it('Error', () => { });
+    function testError(error) {
+      it('simple', () => {
+        const error_c = clone(error);
+        expect(Object.is(error, error_c)).toBe(false);
+        expect(error_c.message).toStrictEqual(error.message);
+        expect(error_c.fileName).toStrictEqual(error.fileName);
+        expect(error_c.lineNumber).toStrictEqual(error.lineNumber);
+      });
 
-    it('EvalError', () => { });
+      testCustomProps(() => error);
+    }
 
-    it('RangeError', () => { });
+    describe('Error', () => {
+      testError(new Error('message', 'filename', 50));
+    });
 
-    it('ReferenceError', () => { });
+    describe('EvalError', () => {
+      testError(new EvalError('message', 'filename', 50));
+    });
 
-    it('SyntaxError', () => { });
+    describe('RangeError', () => {
+      testError(new RangeError('message', 'filename', 50));
+    });
 
-    it('TypeError', () => { });
+    describe('ReferenceError', () => {
+      testError(new ReferenceError('message', 'filename', 50));
+    });
 
-    it('URIError', () => { });
+    describe('SyntaxError', () => {
+      testError(new SyntaxError('message', 'filename', 50));
+    });
+
+    describe('TypeError', () => {
+      testError(new TypeError('message', 'filename', 50));
+    });
+
+    describe('URIError', () => {
+      testError(new URIError('message', 'filename', 50));
+    });
 
   });
 
