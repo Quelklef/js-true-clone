@@ -131,6 +131,13 @@ cloners.set(RegExp.prototype, function(source, cache, clone) {
 });
 
 cloners.set(Set.prototype, function(source, cache, clone) {
+  const result = new Set();
+  cache.set(source, result);
+  mirror(source, result, clone);
+  for (const val of source) {
+    result.add(clone(val));
+  }
+  return result;
 });
 
 cloners.set(SharedArrayBuffer.prototype, function(source, cache, clone) {
@@ -169,9 +176,13 @@ cloners.set(Uint32Array.prototype, function(source, cache, clone) {
 });
 
 cloners.set(WeakMap.prototype, function(source, cache, clone) {
+  // WeakMaps cannot be cloned :(
+  return source;
 });
 
 cloners.set(WeakSet.prototype, function(source, cache, clone) {
+  //WeakSets cannot be cloned :(
+  return source;
 });
 
 // == ERRORS == //

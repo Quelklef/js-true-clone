@@ -163,7 +163,6 @@ describe('true clone', () => {
     });
 
     describe('Map', () => {
-
       it('nonempty', () => {
         const map = new Map();
         map.set([], 'empty');
@@ -178,7 +177,6 @@ describe('true clone', () => {
         custom.set('ping', 'pong');
         return custom;
       });
-
     });
 
     describe('Number', () => {
@@ -199,7 +197,26 @@ describe('true clone', () => {
 
     it('RegExp', () => { });
 
-    it('Set', () => { });
+    describe('Set', () => {
+      test('simple', () => {
+        const set = new Set([1, 2, 3]);
+        const set_c = clone(set);
+        expect(set_c).toStrictEqual(set);
+        expect(set_c).not.toBe(set);
+      });
+
+      test('with self-reference', () => {
+        const set = new Set([1, 2, 3]);
+        set.add(set);
+        const set_c = clone(set);
+        expect(set_c).toStrictEqual(set);
+        expect(set_c).not.toBe(set);
+        expect(set_c.has(set_c)).toBe(true);
+        expect(set_c.has(set)).toBe(false);
+      });
+
+      testCustomProps(() => new Set([1, 2, 3]));
+    });
 
     it('SharedArrayBuffer', () => { });
 
@@ -225,10 +242,6 @@ describe('true clone', () => {
     describe('Uint32Array', () => {
       testTypedArray(Uint32Array, 12);
     });
-
-    it('WeakMap', () => { });
-
-    it('WeakSet', () => { });
 
     it('Error', () => { });
 
