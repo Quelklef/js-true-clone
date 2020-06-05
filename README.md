@@ -24,11 +24,62 @@ Updates to this package will thus almost always be either minor- or patch-level 
 
 ### Caveats
 
-Javascript is a complex language, and a perfect cloning algorithm doesn't seem to be possible as this time.
+Where *caveat* means incorrect behaviour due to JS limitations.
 
 - **`Function`, `Promise`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
 
 - **`Proxy`**: Proxies will not be detected and will not be preserved while cloning.
+
+### Gotchas
+
+Where *gotcha* means behaviour that isn't wrong but may be surprising or undesirable.
+
+- **Monkeypatching methods**: Cloning bound functions can cause some undesirable behaviour relating to monkeypatching methods:
+
+```js
+const list = ['i', 'am'];
+
+// Monkeypatch .toString() to include brackets
+const old_toString = Array.prototype.toString.bind(list);
+list.toString = () => '[' + old_toString() + ']';
+
+// Works OK
+list.push('error');
+console.assert(list.toString() === '[i,am,error]');
+
+// Now try cloning it
+const { clone } = require('true-clone');
+const cloned = clone(list);
+
+// Oh no!
+cloned.push('room');
+console.assert(cloned.toString() === '[i,am,error]');
+```
+
+The issue is that `cloned.toString` shadows `old_toString` which is still boud to `list`.
+Thus, calling `cloned.toString` will render the contents of `list`, not `cloned`.
+
+The easiest fix for this is to wait for the `this` argument within the moneypatched call, for instance by replacing
+```js
+const old_toString = Array.prototype.toString.bind(list);
+list.toString = () => '[' + old_toString() + ']';
+```
+with
+```js
+list.toString = function() {
+  const old_toString = Array.prototype.toString.bind(this);
+  return '[' + old_toString() + ']';
+}
+```
+or with
+```js
+list.toString = function() {
+  return '[' + Array.prototype.toString.call(this) + ']';
+}
+```
+
+Another fix is to use prototyping instead of monkeypatching.
+
 
 ### Custom cloning
 
