@@ -351,10 +351,6 @@ function shared_tests(clone) {
         assert(cloned.has(cloned));
       });
 
-      test('diamond-shaped', () => {
-        // N/A
-      });
-
       testMonkeypatching(new Set([1, 2, 3]), Set_matches);
 
     });
