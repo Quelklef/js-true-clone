@@ -39,7 +39,7 @@ Updates to this package will thus almost always be either minor- or patch-level 
 
 Where *caveat* means incorrect behaviour due to JS limitations.
 
-- **`Function`, `Promise`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
+- **`Function`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
 
 - **`Proxy`**: Proxies will not be detected and will not be preserved while cloning.
 
