@@ -220,7 +220,16 @@ describe('true clone', () => {
 
     it('SharedArrayBuffer', () => { });
 
-    it('String', () => { });
+    describe('String', () => {
+      it('simple', () => {
+        const string = new String('string');
+        const string_c = clone(string);
+        expect(string_c).toStrictEqual(string);
+        expect(string_c).not.toBe(string);
+      });
+
+      testCustomProps(() => new String('imastring'));
+    });
 
     it('Symbol', () => {
       const s = Symbol('s');

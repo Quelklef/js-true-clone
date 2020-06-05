@@ -144,6 +144,9 @@ cloners.set(SharedArrayBuffer.prototype, function(source, cache, clone) {
 });
 
 cloners.set(String.prototype, function(source, cache, clone) {
+  const result = new String(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Symbol.prototype, function(source, cache, clone) {
