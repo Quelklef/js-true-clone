@@ -1,5 +1,5 @@
 
-module.exports = { shared_tests };
+module.exports = { shared_tests, within };
 
 class AssertionError extends Error { }
 
@@ -16,16 +16,16 @@ function within(name, body) {
 
 function test(name, body) {
 
-  let succeeded;
+  let result;
 
   try {
     body();
-    succeeded = true;
+    result = 'success';
   } catch (e) {
     if (e instanceof AssertionError) {
-      succeeded = false;
+      result = 'improper';
     } else {
-      throw e;
+      result = 'bug';
     }
   }
 
@@ -35,8 +35,8 @@ function test(name, body) {
   const c_red = "\x1b[31m";
   const c_green = "\x1b[32m";
 
-  const mark = succeeded ? '+' : '-';
-  const color = succeeded ? c_green : c_bright + c_red;
+  const mark = { success: '+', improper: '-', bug: '!' }[result];
+  const color = result === 'success' ? c_green : c_bright + c_red;
   const full_name = [...context, name].join(' > ');
   const text = `${color}[${mark}] ${full_name}${c_reset}`;
 
