@@ -121,6 +121,11 @@ cloners.set(Object.prototype, function(source, cache, clone) {
   return result;
 });
 
+cloners.set(Promise.prototype, function(source, cache, clone) {
+  // Promises do not seem to be cloneable
+  return source;
+});
+
 cloners.set(RegExp.prototype, function(source, cache, clone) {
   const result = new RegExp(source);
   mirror(source, result, clone);

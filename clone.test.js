@@ -191,6 +191,11 @@ describe('true clone', () => {
       testCustomProps(() => new Number(3.14));
     });
 
+    it('Promise', () => {
+      const p = Promise.resolve(0);
+      expect(clone(p)).toBe(p);
+    });
+
     describe('RegExp', () => {
       it('simple', () => {
         const reg = /x/g;
