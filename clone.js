@@ -15,6 +15,18 @@ function mirror(source, result, clone) {
   }
 }
 
+// NOTE TO FUTURE SELF:
+// Some of these types, such as Symbol and (promitive) boolean, seem to be resistant to property assignment.
+// For instance, take the following:
+//   sym = Symbol()
+//   sym.prop = 'val'
+// this will not fail; however,
+//   sym.prop
+// will be undefined rather than 'val'.
+// This seems to be an error with 'use strict'.
+// Anyway, it may be a good thing to treat explicitly in this project.
+// Include it in documentation, don't mirror() these types, and perhaps even add tests.
+
 // Some types must be handled specially
 // (For instance if they have any internal slots)
 // I've taken this list from the list of well-known intrinsic objects (https://tc39.es/ecma262/#sec-well-known-intrinsic-objects)
