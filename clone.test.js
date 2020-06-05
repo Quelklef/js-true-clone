@@ -1,5 +1,5 @@
 
-const { clone } = require('./clone.js');
+const { clone, custom_clone } = require('./clone.js');
 
 function testCustomProps(get_uncloned) {
   it('with custom properties', () => {
@@ -454,6 +454,27 @@ describe('true clone', () => {
       expect(obj_c.getter).toBe('got');
     });
 
+  });
+
+  describe('allows for custom cloners', () => {
+    it('on objects', () => {
+      const obj = {
+        [custom_clone]() {
+          return 10;
+        }
+      };
+      expect(clone(obj)).toStrictEqual(10);
+    });
+
+    it('on prototypes', () => {
+      class MyClass {
+        [custom_clone]() {
+          return 10;
+        }
+      }
+      const obj = new MyClass();
+      expect(clone(obj)).toStrictEqual(10);
+    });
   });
 
 });

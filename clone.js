@@ -1,5 +1,5 @@
 
-module.exports = { clone: outer_clone };
+module.exports = { };
 
 // Copy properties from `source` to `result`
 function mirror(source, result, clone) {
@@ -270,7 +270,11 @@ cloners.set(URIError.prototype, function(source, cache, clone) {
   return result;
 });
 
+const custom_clone = Symbol();
+module.exports.customClone = custom_clone;
+module.exports.custom_clone = custom_clone;
 
+module.exports.clone =
 function outer_clone(source) {
 
   // We want to preserve correct structure in objects with tricky references,
@@ -298,6 +302,11 @@ function outer_clone(source) {
     // return early on cache hit
     if (cache.has(source)) {
       return cache.get(source);
+    }
+
+    // Allow for custom cloning
+    if (source[custom_clone]) {
+      return source[custom_clone]();
     }
 
     const prototype = Object.getPrototypeOf(source);
