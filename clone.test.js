@@ -1,404 +1,537 @@
 
 const { clone, custom_clone } = require('./clone.js');
 
-function testCustomProps(get_uncloned) {
-  it('with custom properties', () => {
-    const uncloned = get_uncloned();
-    uncloned.my = 'prop';
-    const cloned = clone(uncloned);
-    expect(cloned).toStrictEqual(uncloned);
-    expect(cloned).not.toBe(uncloned);
-    expect(cloned.my).toStrictEqual(uncloned.my);
-    cloned.my = 'different';
-    expect(cloned.my).not.toStrictEqual(uncloned.my);
-  });
+function assert(bool) {
+  if (!bool) throw new Error('assertion failed');
 }
+
+// TODO: develop a true-equals package for true object equality
+//       on the same lines as this package
 
 describe('true clone', () => {
 
   describe('primitives', () => {
 
     it('null', () => {
-      expect(clone(null)).toBe(null);
+      assert(clone(null) === null);
     });
 
     it('undefined', () => {
-      expect(clone(undefined)).toBe(undefined);
+      assert(clone(undefined) === undefined);
     });
 
-    it('nice numbers', () => {
-      expect(clone(1)).toBe(1);
-      expect(clone(-1)).toBe(-1);
-      expect(clone(3.75)).toBe(3.75);
+    it('number', () => {
+      assert(clone(1) === 1);
+      assert(clone(-1) === -1);
+      assert(clone(3.75) === 3.75);
+      assert(clone(Number.INFINITY) === Number.INFINITY);
+      assert(clone(Number.NEGATIVE_INFINITY) === Number.NEGATIVE_INFINITY);
+      assert(Number.isNaN(clone(Number.NaN)));
     });
 
-    it('+/- infinity', () => {
-      expect(clone(Number.INFINITY)).toBe(Number.INFINITY);
-      expect(clone(Number.NEGATIVE_INFINITY)).toBe(Number.NEGATIVE_INFINITY);
+    it('string', () => {
+      assert(clone('') === '');
+      assert(clone('string') === 'string');
     });
 
-    it('NaN', () => {
-      expect(clone(Number.NaN)).toBe(Number.NaN);
+    it('boolean', () => {
+      assert(clone(false) === false);
+      assert(clone(true) === true);
     });
 
-    it('strings', () => {
-      expect(clone('')).toBe('');
-      expect(clone('string')).toBe('string');
+    it('symbol', () => {
+      const symbol = Symbol();
+      assert(clone(symbol) === symbol);
     });
 
-    it('booleans', () => {
-      expect(clone(false)).toBe(false);
-      expect(clone(true)).toBe(true);
+    it('bigint', () => {
+      assert(clone(0n) === 0n);
+      assert(clone(100n) === 100n);
+      assert(clone(-100n) === -100n);
     });
 
   });
 
-  describe('special types', () => {
+  function testMonkeypatching(object, matches) {
+    it('monkeypatched', () => {
+      const prop_name = Symbol();
+      object[prop_name] = 'prop val';
+      const cloned = clone(object);
+      assert(matches(cloned, object));
+      assert(cloned[prop_name] === object[prop_name]);
+      cloned[prop_name] = 'different';
+      assert(cloned[prop_name] !== object[prop_name]);
+    });
+  }
+
+  describe('object types', () => {
+
+    describe('Number', () => {
+      function Number_matches(number_1, number_2) {
+        return number_1 !== number_2 && +number_1 === +number_2;
+      }
+
+      it('simple', () => {
+        const number = new Number(3.14);
+        assert(Number_matches(number, clone(number)));
+      });
+
+      testMonkeypatching(new Number(3.14), Number_matches);
+    });
+
+    describe('String', () => {
+      function String_matches(str1, str2) {
+        return str1 !== str2 && '' + str1 === '' + str2;
+      }
+
+      it('simple', () => {
+        const string = new String('string');
+        assert(String_matches(string, clone(string)));
+      });
+
+      testMonkeypatching(new String('imastring'), String_matches);
+    });
+
+    it('Boolean', () => {
+    });
+
+    describe('Date', () => {
+      function Date_matches(date1, date2) {
+        return date1 !== date2 && date1.toISOString() == date2.toISOString();
+      }
+
+      it('simple', () => {
+        const now = new Date();
+        assert(Date_matches(now, clone(now)));
+      });
+
+      testMonkeypatching(new Date(), Date_matches);
+    });
+
+    it('Function', () => {
+    });
+
+    it('Promise', () => {
+    });
+
+    describe('RegExp', () => {
+      function RegExp_matches(reg1, reg2) {
+        return (
+          reg1 !== reg2
+          && reg1.lastIndex === reg2.lastIndex
+          && reg1.dotAll === reg2.dotAll
+          && reg1.flags === reg2.flags
+          && reg1.global === reg2.global
+          && reg1.ignoreCase === reg2.ignoreCase
+          && reg1.multiline === reg2.multiline
+          && reg1.source === reg2.source
+          && reg1.sticky === reg2.sticky
+          && reg1.unicode === reg2.unicode
+        );
+      }
+
+      it('simple', () => {
+        const reg = /x/g;
+        assert(RegExp_matches(reg, clone(reg)));
+      });
+
+      testMonkeypatching(/x/g, RegExp_matches);
+    });
+
+  });
+
+  describe('container types', () => {
 
     describe('Array', () => {
 
+      function Array_matches(ar1, ar2) {
+        // contents equality tested with ===
+        // except for in the case of nested arrays
+        if (ar1 === ar2 || ar1.length !== ar2.length)
+          return false;
+
+        for (let i = 0; i < ar1.length; i++) {
+          const val1 = ar1[i];
+          const val2 = ar2[i];
+          const are_equal =
+            val1 instanceof Array
+              ? val2 instanceof Array && Array_matches(val1, val2)
+              : val1 === val2;
+
+          if (!are_equal) return false;
+        }
+
+        return true;
+      }
+
       it('empty', () => {
         const empty = [];
-        const empty_c = clone(empty);
-        expect(empty_c).toStrictEqual(empty);
-        expect(empty_c).not.toBe(empty);
+        assert(Array_matches(empty, clone(empty)));
       });
 
       it('nonempty', () => {
-        const nonempty = [1, 2, 3];
-        const nonempty_c = clone(nonempty);
-        expect(nonempty_c).toStrictEqual(nonempty);
-        expect(nonempty_c).not.toBe(nonempty);
+        const nonempty = [Number.INFINITY, 0, undefined, Symbol(), 12n];
+        assert(Array_matches(nonempty, clone(nonempty)));
       });
 
       it('nested', () => {
         const nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
-        const nested_c = clone(nested);
-        expect(nested_c).toStrictEqual(nested);
-        expect(nested_c).not.toBe(nested);
-        for (let i = 0; i < nested.length; i++)
-          expect(nested_c[i]).not.toBe(nested[i]);
+        assert(Array_matches(nested, clone(nested)));
       });
 
-      testCustomProps(() => [3, 1, 4]);
-
-      it('with self-reference', () => {
-        const array = [0, 1, 2];
-        array[1] = array;
-        const array_c = clone(array);
-        expect(array_c).toStrictEqual(array);
-        expect(Object.is(array_c[1], array_c)).toBe(true);
+      it('cyclic', () => {
+        const cyclic = ['before', undefined, 'after'];
+        cyclic[1] = cyclic;
+        const cloned = clone(cyclic);
+        assert(cloned[0] === 'before');
+        assert(cloned[1] === cloned);
+        assert(cloned[2] === 'after');
       });
 
-    });
-
-    it('BigInt', () => {
-      expect(clone(0n)).toStrictEqual(0n);
-      expect(clone(100n)).toStrictEqual(100n);
-      expect(clone(-100n)).toStrictEqual(-100n);
-    });
-
-    it('Boolean', () => { });
-
-    describe('Date', () => {
-      it('simple', () => {
-        const now = new Date();
-        const now_c = clone(now);
-        expect(now_c).toStrictEqual(now);
+      it('diamond-shaped', () => {
+        const child = ['im', 'child'];
+        const parent = ['before', child, 'between', child, 'after'];
+        const cloned = clone(parent);
+        assert(Array_matches(parent, cloned));
+        assert(parent[1] !== cloned[1]);
+        assert(cloned[1] === cloned[3]);
       });
 
-      testCustomProps(() => new Date());
-    });
+      testMonkeypatching([3, 1, 4], Array_matches);
 
-    it('Function', () => {
-      const f = () => {};
-      expect(clone(f)).toBe(f);
     });
 
     describe('Map', () => {
+
+      function Map_matches(map1, map2) {
+        if (map1 === map2 || map1.size !== map2.size)
+          return false;
+
+        for (const key of map1.keys()) {
+          if (!map2.has(key)) return false;
+          const val1 = map1.get(key);
+          const val2 = map2.get(key);
+          const are_equal =
+            val1 instanceof Map
+              ? val2 instanceof Map && Map_matches(val1, val2)
+              : val1 === val2;
+
+          if (!are_equal) return false;
+        }
+
+        return true;
+      }
+
+      it('empty', () => {
+        const empty = new Map();
+        assert(Map_matches(empty, clone(empty)));
+      });
+
       it('nonempty', () => {
-        const map = new Map();
-        map.set([], 'empty');
-        map.set([1, 2, 3], 'counting')
-        const map_c = clone(map);
-        expect(map_c).toStrictEqual(map);
-        expect(map_c).not.toBe(map);
+        const nonempty = new Map([['ping', 'x'], ['y', 'pong']]);
+        assert(Map_matches(nonempty, clone(nonempty)));
       });
 
-      testCustomProps(() => {
-        const custom = new Map();
-        custom.set('ping', 'pong');
-        return custom;
-      });
-    });
-
-    describe('Number', () => {
-      it('simple', () => {
-        const number = new Number(3.14);
-        number.my = 'prop';
-        const number_c = clone(number);
-        expect(+number_c).toBe(3.14);
-        expect(Object.is(number_c, number)).toBe(false);
+      it('nested', () => {
+        const nested = new Map([['m', new Map([['mx', 0]])]]);
+        assert(Map_matches(nested, clone(nested)));
       });
 
-      testCustomProps(() => new Number(3.14));
-    });
-
-    it('Promise', () => {
-      const p = Promise.resolve(0);
-      expect(clone(p)).toBe(p);
-    });
-
-    describe('RegExp', () => {
-      it('simple', () => {
-        const reg = /x/g;
-        const reg_c = clone(reg);
-        expect(reg).toStrictEqual(reg_c);
-        expect(Object.is(reg, reg_c)).toBe(false);
+      it('cyclic', () => {
+        const cyclic = new Map();
+        cyclic.set('self', cyclic);
+        const cloned = clone(cyclic);
+        assert(cloned !== cyclic);
+        assert(cloned.size === cyclic.size);
+        assert(cloned.get('self') === cloned);
       });
 
-      testCustomProps(() => /x/g);
+      it('diamond-shaped', () => {
+        const child = new Map([['i am', 'child']]);
+        const diamond = new Map([['a', child], ['b', child]]);
+        const cloned = clone(diamond);
+        assert(Map_matches(diamond, cloned));
+      });
+
+      testMonkeypatching(new Map([['ping', 'x'], ['y', 'pong']]), Map_matches);
+
     });
 
     describe('Set', () => {
-      test('simple', () => {
-        const set = new Set([1, 2, 3]);
-        const set_c = clone(set);
-        expect(set_c).toStrictEqual(set);
-        expect(set_c).not.toBe(set);
+
+      function Set_matches(set1, set2) {
+        if (set1 === set2 || set1.size !== set2.size)
+          return false;
+
+        for (const item of set1) {
+          const is_contained =
+            item instanceof Set
+              ? [...set2].some(s => s instanceof Set && Set_matches(item, s))
+              : set2.has(item);
+
+          if (!is_contained) return false;
+        }
+
+        return true;
+      }
+
+      it('empty', () => {
+        const empty = new Set([]);
+        assert(Set_matches(empty, clone(empty)));
       });
 
-      test('with self-reference', () => {
-        const set = new Set([1, 2, 3]);
-        set.add(set);
-        const set_c = clone(set);
-        expect(set_c).toStrictEqual(set);
-        expect(set_c).not.toBe(set);
-        expect(set_c.has(set_c)).toBe(true);
-        expect(set_c.has(set)).toBe(false);
+      it('nonempty', () => {
+        const nonempty = new Set([1, 2, 3]);
+        assert(Set_matches(nonempty, clone(nonempty)));
       });
 
-      testCustomProps(() => new Set([1, 2, 3]));
-    });
-
-    describe('String', () => {
-      it('simple', () => {
-        const string = new String('string');
-        const string_c = clone(string);
-        expect(string_c).toStrictEqual(string);
-        expect(string_c).not.toBe(string);
+      it('nested', () => {
+        const child = new Set(['child']);
+        const parent = new Set([child]);
+        assert(Set_matches(parent, clone(parent)));
       });
 
-      testCustomProps(() => new String('imastring'));
-    });
+      it('cyclic', () => {
+        const cyclic = new Set();
+        cyclic.add(cyclic);
+        const cloned = clone(cyclic);
+        assert(cloned !== cyclic)
+        assert(cloned.has(cloned));
+      });
 
-    it('Symbol', () => {
-      const s = Symbol('s');
-      expect(clone(s)).toBe(s);
+      it('diamond-shaped', () => {
+        // N/A
+      });
+
+      testMonkeypatching(new Set([1, 2, 3]), Set_matches);
+
     });
 
     it('WeakMap', () => {
-      const wm = new WeakMap();
-      expect(clone(wm)).toBe(wm);
+      // TODO
     });
 
     it('WeakSet', () => {
-      const ws = new WeakSet();
-      expect(clone(ws)).toBe(ws);
+      // TODO
     });
 
-    // == TYPED ARRAYS ET AL == //
+  });
+
+  describe('typed arrays et al', () => {
+
+    function ArrayBuffer_matches(ab1, ab2) {
+      const view1 = new Int8Array(ab1);
+      const view2 = new Int8Array(ab2);
+      return TypedArray_matches(view1, view2);
+    }
 
     describe('ArrayBuffer', () => {
       it('simple', () => {
         const buffer = new ArrayBuffer(32);
-        const view = new DataView(buffer);
-        const buffer_c = clone(buffer);
-        const c_view = new DataView(buffer_c);
-        c_view.setInt16(0, 12);
-        expect(Object.is(buffer_c, buffer)).toBe(false);
-        expect(view.getInt16(0)).not.toBe(12);
+        assert(ArrayBuffer_matches(buffer, clone(buffer)));
       });
 
-      testCustomProps(() => new ArrayBuffer(16));
+      testMonkeypatching(new ArrayBuffer(16), ArrayBuffer_matches);
     });
 
     describe('SharedArrayBuffer', () => {
       // Doesn't really seem to be any way to test these? :/
     });
 
+    function DataView_matches(dv1, dv2) {
+      return (
+        dv1 !== dv2
+        && dv1.byteOffset === dv2.byteOffset
+        && dv1.byteLength === dv2.byteLength
+        && ArrayBuffer_matches(dv1.buffer, dv2.buffer)
+      );
+    }
+
     describe('DataView', () => {
       it('simple', () => {
         const buffer = new ArrayBuffer(32);
         const view = new DataView(buffer, 1, 16);
-        const view_c = clone(view);
-        expect(view_c.byteOffset).toStrictEqual(view.byteOffset);
-        expect(view_c.byteLength).toStrictEqual(view.byteLength);
-        expect(Object.is(view_c.buffer, view.buffer)).toBe(false);
-        expect(Object.is(view_c, view)).toBe(false);
-        view_c.setInt16(0, 12);
-        expect(view.getInt16(0)).not.toBe(12);
-        expect(view.getInt16(1)).not.toBe(12);
+        const cloned = clone(view);
+        assert(DataView_matches(view, cloned));
+        assert(view.buffer !== cloned.buffer);
+        cloned.setInt16(0, 12);
+        assert(view.getInt16(0) !== 12);
+        assert(view.getInt16(1) !== 12);
       });
 
-      testCustomProps(() => new DataView(new ArrayBuffer(16)));
+      testMonkeypatching(new DataView(new ArrayBuffer(16)), DataView_matches);
     });
+
+    function TypedArray_matches(ta1, ta2) {
+      if (ta1 === ta2 || ta1.length !== ta2.length)
+        return false;
+
+      for (let i = 0; i < ta1.length; i++) {
+        if (ta1[i] !== ta2[i]) return false;
+      }
+
+      return true;
+    }
 
     function testTypedArray(constructor, sample_value) {
-      it('empty', () => {
-        const array = new constructor(100);
-        const array_c = clone(array);
-        expect(array_c).toStrictEqual(array);
-        expect(array_c).not.toBe(array);
-      });
+      describe(constructor.name, () => {
+        it('empty', () => {
+          const empty = new constructor(32);
+          assert(TypedArray_matches(empty, clone(empty)));
+        });
 
-      it('nonempty', () => {
-        const array = new constructor(100);
-        array[0] = sample_value;
-        const array_c = clone(array);
-        expect(array_c).toStrictEqual(array);
-        expect(array_c).not.toBe(array);
-      });
+        it('nonempty', () => {
+          const nonempty = new constructor(32);
+          nonempty[0] = sample_value;
+          nonempty[15] = sample_value;
+          nonempty[31] = sample_value;
+          assert(TypedArray_matches(nonempty, clone(nonempty)));
+        });
 
-      testCustomProps(() => {
-        const array = new constructor(100);
-        array[0] = sample_value;
-        return array;
+        testMonkeypatching(
+          (() => {
+            const array = new constructor(32);
+            array[0] = sample_value;
+            array[15] = sample_value;
+            array[31] = sample_value;
+            return array;
+          })(),
+          TypedArray_matches,
+        );
       });
     }
 
-    describe('BigInt64Array', () => {
+    describe('typed arrays', () => {
       testTypedArray(BigInt64Array, 12n);
-    });
-
-    describe('BigUint64Array', () => {
       testTypedArray(BigUint64Array, 12n);
-    });
-
-    describe('Float32Array', () => {
       testTypedArray(Float32Array, 3.14);
-    });
-
-    describe('Float64Array', () => {
       testTypedArray(Float64Array, 3.14);
-    });
-
-    describe('Int8Array', () => {
       testTypedArray(Int8Array, 12);
-    });
-
-    describe('Int16Array', () => {
       testTypedArray(Int16Array, 12);
-    });
-
-    describe('Int32Array', () => {
       testTypedArray(Int32Array, 12);
-    });
-
-    describe('Uint8Array', () => {
       testTypedArray(Uint8Array, 12);
-    });
-
-    describe('Uint8ClampedArray', () => {
       testTypedArray(Uint8ClampedArray, 12);
-    });
-
-    describe('Uint16Array', () => {
       testTypedArray(Uint16Array, 12);
-    });
-
-    describe('Uint32Array', () => {
       testTypedArray(Uint32Array, 12);
-    });
-
-    // == ERRORS == //
-
-    function testError(error) {
-      it('simple', () => {
-        const error_c = clone(error);
-        expect(Object.is(error, error_c)).toBe(false);
-        expect(error_c.message).toStrictEqual(error.message);
-        expect(error_c.fileName).toStrictEqual(error.fileName);
-        expect(error_c.lineNumber).toStrictEqual(error.lineNumber);
-      });
-
-      testCustomProps(() => error);
-    }
-
-    describe('Error', () => {
-      testError(new Error('message', 'filename', 50));
-    });
-
-    describe('EvalError', () => {
-      testError(new EvalError('message', 'filename', 50));
-    });
-
-    describe('RangeError', () => {
-      testError(new RangeError('message', 'filename', 50));
-    });
-
-    describe('ReferenceError', () => {
-      testError(new ReferenceError('message', 'filename', 50));
-    });
-
-    describe('SyntaxError', () => {
-      testError(new SyntaxError('message', 'filename', 50));
-    });
-
-    describe('TypeError', () => {
-      testError(new TypeError('message', 'filename', 50));
-    });
-
-    describe('URIError', () => {
-      testError(new URIError('message', 'filename', 50));
     });
 
   });
 
+  function testError(error) {
+    describe(error.constructor.prototype.name, () => {
+      function Error_matches(err1, err2) {
+        return (
+          err1 !== err2
+          && err1.constructor == err2.constructor
+          && err1.message == err2.message
+          && err1.fileName == err2.fileName
+          && err1.lineNumber == err2.lineNumber
+        );
+      }
+
+      it('simple', () => {
+        assert(Error_matches(error, clone(error)));
+      });
+
+      testMonkeypatching(error, Error_matches);
+    });
+  }
+
+  describe('errors', () => {
+    testError(new Error('message', 'filename', 50));
+    testError(new EvalError('message', 'filename', 50));
+    testError(new RangeError('message', 'filename', 50));
+    testError(new ReferenceError('message', 'filename', 50));
+    testError(new SyntaxError('message', 'filename', 50));
+    testError(new TypeError('message', 'filename', 50));
+    testError(new URIError('message', 'filename', 50));
+  });
+
   describe('plain and custom objects', () => {
 
-    it('emtpy', () => {
+    function Object_matches(obj1, obj2) {
+
+      if (obj1 === obj2)
+        return false;
+
+      if (Object.getPrototypeOf(obj1) !== Object.getPrototypeOf(obj2))
+        return false;
+
+      const descriptors1 = Object.getOwnPropertyDescriptors(obj1);
+      const descriptors2 = Object.getOwnPropertyDescriptors(obj2);
+
+      const keys1 = Reflect.ownKeys(obj1);
+      const keys2 = Reflect.ownKeys(obj2);
+
+      if (keys1.length !== keys2.length)
+        return false;
+
+      for (const key of keys1) {
+        const descriptor1 = descriptors1[key];
+        const descriptor2 = descriptors2[key];
+
+        if (!(
+          descriptor1.configurable === descriptor2.configurable
+          && descriptor1.enumerable === descriptor2.enumerable
+          && descriptor1.writable === descriptor2.writable
+          && descriptor1.get === descriptor2.get
+          && descriptor1.set === descriptor2.set
+        ))
+          return false;
+
+        const value1 = descriptor1.value;
+        const value2 = descriptor2.value;
+
+        const value1_is_obj = typeof value1 === 'object' && value1 !== null;
+        const value2_is_obj = typeof value2 === 'object' && value2 !== null;
+        if (value1_is_obj || value2_is_obj) {
+          if (!(value1_is_obj && value2_is_obj))
+            return false;
+          return Object_matches(value1, value2);
+        } else {
+          return value1 === value2;
+        }
+      }
+
+      return true;
+
+    }
+
+    it('empty', () => {
       const empty = {};
-      const empty_c = clone(empty);
-      expect(empty_c).toStrictEqual(empty);
-      expect(empty_c).not.toBe(empty);
+      assert(Object_matches(empty, clone(empty)));
     });
 
     it('nonempty', () => {
       const nonempty = { left: 'right', up: 'down', red: 'blue' };
-      const nonempty_c = clone(nonempty);
-      expect(nonempty_c).toStrictEqual(nonempty);
-      expect(nonempty_c).not.toBe(nonempty);
+      assert(Object_matches(nonempty, clone(nonempty)));
     });
 
     it('nested', () => {
       const nested = { child: { val: 'val!' } };
-      const nested_c = clone(nested);
-      expect(nested_c).toStrictEqual(nested);
-      expect(nested_c).not.toBe(nested);
-      expect(nested_c.child).not.toBe(nested.child);
+      assert(Object_matches(nested, clone(nested)));
+    });
+
+    it('cyclic', () => {
+      const object = { };
+      object.self = object;
+      const cloned = clone(object);
+      assert(cloned !== object);
+      assert(cloned.self === cloned);
+    });
+
+    it('diamond-shaped', () => {
+      const child = { i_am: 'child' };
+      const parent = { left: child, right: child };
+      const cloned = clone(parent);
+      assert(Object_matches(cloned, parent));
+      assert(cloned.left === cloned.right);
     });
 
     it('with non-string keys', () => {
-      const sym = Symbol();
-      const funky = { [sym]: 'sym', str: 'str' };
-      const funky_c = clone(funky);
-      expect(funky_c).toStrictEqual(funky);
-    });
-
-    it('with cycles', () => {
-      const object = { prop: 'val' };
-      object.self = object;
-      const object_c = clone(object);
-      expect(object_c).toStrictEqual(object);
-      expect(Object.is(object_c.self, object_c)).toBe(true);
-    });
-
-    it('with tricky reference structures', () => {
-      const target = { i_am: 'target' };
-      const object = { first_ref: target, second_ref: target };
-      const object_c = clone(object);
-      expect(Object.is(object_c.first_ref, object_c.second_ref)).toBe(true);
+      const key = Symbol();
+      const nonempty = { [key]: 'val' };
+      assert(Object_matches(nonempty, clone(nonempty)));
     });
 
     it('function prototype instances with no hierarchy', () => {
@@ -407,8 +540,7 @@ describe('true clone', () => {
         this.right = right;
       }
       const pair = new Pair(3, 4);
-      const pair_c = clone(pair);
-      expect(pair_c).toStrictEqual(pair);
+      assert(Object_matches(pair, clone(pair)));
     });
 
     it('with prototype from Object.create', () => {
@@ -420,9 +552,7 @@ describe('true clone', () => {
       };
       const object = Object.create(proto);
       object.items = [1, 2, 3];
-      const object_c = clone(object);
-      expect(object_c).toStrictEqual(object);
-      expect(object_c.toString()).toStrictEqual('1, 2, 3');
+      assert(Object_matches(object, clone(object)));
     });
 
     it('ES6 class instances with no hierarchy', () => {
@@ -433,8 +563,7 @@ describe('true clone', () => {
         }
       }
       const pair = new Pair(3, 4);
-      const pair_c = clone(pair);
-      expect(pair_c).toStrictEqual(pair);
+      assert(Object_matches(pair, clone(pair)));
     });
 
     it('ES6 classes with hierarchy', () => {
@@ -450,40 +579,40 @@ describe('true clone', () => {
         }
       }
       const child = new Child('p_val', 'c_val');
-      const child_c = clone(child);
-      expect(child_c).toStrictEqual(child);
+      assert(Object_matches(child, clone(child)));
     });
 
     it('with getters', () => {
-      const obj = {};
-      Object.defineProperty(obj, 'getter', {
-        get() { return 'got'; }
+      const object = { val: 'got' };
+      Object.defineProperty(object, 'getter', {
+        get() { return this.val; }
       });
-      const obj_c = clone(obj);
-      expect(obj_c).toStrictEqual(obj);
-      expect(obj_c.getter).toBe('got');
+      const cloned = clone(object);
+      assert(Object_matches(object, cloned));
+      cloned.val = 'tot';
+      assert(cloned.getter === 'tot');
     });
 
   });
 
   describe('allows for custom cloners', () => {
     it('on objects', () => {
-      const obj = {
+      const object = {
         [custom_clone]() {
           return 10;
         }
       };
-      expect(clone(obj)).toStrictEqual(10);
+      assert(clone(object) === 10);
     });
 
     it('on prototypes', () => {
-      class MyClass {
+      class Class {
         [custom_clone]() {
           return 10;
         }
       }
-      const obj = new MyClass();
-      expect(clone(obj)).toStrictEqual(10);
+      const instance = new Class();
+      assert(clone(instance) === 10);
     });
   });
 

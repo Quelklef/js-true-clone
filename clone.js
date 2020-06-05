@@ -79,7 +79,7 @@ cloners.set(Map.prototype, function(source, cache, clone) {
   cache.set(source, result);
   mirror(source, result, clone);
   for (const [key, val] of source.entries()) {
-    result.set(key, val);
+    result.set(clone(key), clone(val));
   }
   return result;
 });
