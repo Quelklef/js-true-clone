@@ -100,7 +100,9 @@ cloners.set(Object.prototype, function(source, cache, clone) {
 
 cloners.set(Promise.prototype, function(source, cache, clone) {
   // Promises do not seem to be cloneable
-  return source;
+  const result = new Promise(source.then.bind(source));
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(RegExp.prototype, function(source, cache, clone) {

@@ -161,7 +161,9 @@ function shared_tests(clone) {
       // currently unclonable :(
     });
 
-    test('Promise', () => {
+    within('Promise', () => {
+      // no real tests at this time
+      testMonkeypatching(Promise.resolve('value'), () => true);
     });
 
     within('RegExp', () => {
