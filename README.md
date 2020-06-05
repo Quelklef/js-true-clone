@@ -2,7 +2,7 @@
 
 The goal of this package is to get as close as possible to a perfect value clone in JS, being aware of prototypes, getters & setters, etc.
 
-### Usage
+## Usage
 
 ```js
 npm i true-clone
@@ -16,13 +16,13 @@ const { clone } = require('true-clone');
 const cloned = clone(my_object);
 ```
 
-### Versioning
+## Versioning
 
 The *official* API for this package is to provide a cloning algorithm with perfect behaviour.
 All impefect behaviour, even if documented, is *not* a part of the API and should *not* be relied on.
 Updates to this package will thus almost always be either minor- or patch-level updates.
 
-### Caveats
+## Caveats
 
 Where *caveat* means incorrect behaviour due to JS limitations.
 
@@ -30,7 +30,7 @@ Where *caveat* means incorrect behaviour due to JS limitations.
 
 - **`Proxy`**: Proxies will not be detected and will not be preserved while cloning.
 
-### Gotchas
+## Gotchas
 
 Where *gotcha* means behaviour that isn't wrong but may be surprising or undesirable.
 
@@ -81,7 +81,7 @@ list.toString = function() {
 Another fix is to use prototyping instead of monkeypatching.
 
 
-### Custom cloning
+## Custom cloning
 
 If this package is breaking on particular values, you may patch in a custom cloning function for any object or type.
 Import the `customClone` symbol, then assign the `[customClone]` property of your object or prototype to the custom cloning function.
