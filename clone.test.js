@@ -115,7 +115,19 @@ describe('true clone', () => {
 
     });
 
-    it('ArrayBuffer', () => { });
+    describe('ArrayBuffer', () => {
+      it('simple', () => {
+        const buffer = new ArrayBuffer(32);
+        const view = new DataView(buffer);
+        const buffer_c = clone(buffer);
+        const c_view = new DataView(buffer_c);
+        c_view.setInt16(0, 12);
+        expect(Object.is(buffer_c, buffer)).toBe(false);
+        expect(view.getInt16(0)).not.toBe(12);
+      });
+
+      testCustomProps(() => new ArrayBuffer(16));
+    });
 
     it('BigInt', () => {
       expect(clone(0n)).toStrictEqual(0n);
@@ -133,7 +145,22 @@ describe('true clone', () => {
 
     it('Boolean', () => { });
 
-    it('DataView', () => { });
+    describe('DataView', () => {
+      it('simple', () => {
+        const buffer = new ArrayBuffer(32);
+        const view = new DataView(buffer, 1, 16);
+        const view_c = clone(view);
+        expect(view_c.byteOffset).toStrictEqual(view.byteOffset);
+        expect(view_c.byteLength).toStrictEqual(view.byteLength);
+        expect(Object.is(view_c.buffer, view.buffer)).toBe(false);
+        expect(Object.is(view_c, view)).toBe(false);
+        view_c.setInt16(0, 12);
+        expect(view.getInt16(0)).not.toBe(12);
+        expect(view.getInt16(1)).not.toBe(12);
+      });
+
+      testCustomProps(() => new DataView(new ArrayBuffer(16)));
+    });
 
     describe('Date', () => {
       it('simple', () => {
@@ -236,7 +263,9 @@ describe('true clone', () => {
       testCustomProps(() => new Set([1, 2, 3]));
     });
 
-    it('SharedArrayBuffer', () => { });
+    describe('SharedArrayBuffer', () => {
+      // Doesn't really seem to be any way to test these? :/
+    });
 
     describe('String', () => {
       it('simple', () => {

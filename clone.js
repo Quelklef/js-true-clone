@@ -32,6 +32,9 @@ cloners.set(Array.prototype, function(source, cache, clone) {
 });
 
 cloners.set(ArrayBuffer.prototype, function(source, cache, clone) {
+  const result = source.slice();
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(BigInt.prototype, function(source, cache, clone) {
@@ -57,6 +60,9 @@ cloners.set(Boolean.prototype, function(source, cache, clone) {
 });
 
 cloners.set(DataView.prototype, function(source, cache, clone) {
+  const result = new DataView(clone(source.buffer), source.byteOffset, source.byteLength);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Date.prototype, function(source, cache, clone) {
@@ -154,6 +160,9 @@ cloners.set(Set.prototype, function(source, cache, clone) {
 });
 
 cloners.set(SharedArrayBuffer.prototype, function(source, cache, clone) {
+  const result = source.slice();
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(String.prototype, function(source, cache, clone) {
