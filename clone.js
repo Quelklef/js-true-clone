@@ -51,8 +51,9 @@ cloners.set(BigInt.prototype, function(source, cache, clone) {
 });
 
 cloners.set(Boolean.prototype, function(source, cache, clone) {
-  // Boolean objects appear to be immutable
-  return source;
+  const result = new Boolean(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Date.prototype, function(source, cache, clone) {
@@ -86,7 +87,6 @@ cloners.set(Map.prototype, function(source, cache, clone) {
 
 cloners.set(Number.prototype, function(source, cache, clone) {
   const result = new Number(source);
-  cache.set(source, result);
   mirror(source, result, clone);
   return result;
 });

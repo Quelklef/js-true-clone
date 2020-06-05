@@ -131,7 +131,17 @@ function shared_tests(clone) {
       testMonkeypatching(new String('imastring'), String_matches);
     });
 
-    test('Boolean', () => {
+    within('Boolean', () => {
+      function Boolean_matches(bool1, bool2) {
+        return bool1 !== bool2 && !!bool1 === !!bool2;
+      }
+
+      test('simple', () => {
+        const boolean = new Boolean(true);
+        assert(Boolean_matches(boolean, clone(boolean)));
+      });
+
+      testMonkeypatching(new Boolean(true), Boolean_matches);
     });
 
     within('Date', () => {
@@ -147,7 +157,8 @@ function shared_tests(clone) {
       testMonkeypatching(new Date(), Date_matches);
     });
 
-    test('Function', () => {
+    within('Function', () => {
+      // currently unclonable :(
     });
 
     test('Promise', () => {
