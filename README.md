@@ -26,9 +26,9 @@ All updates to this package will be either minor- or patch-level updates.
 
 Javascript is a complex language, and a perfect cloning algorithm doesn't seem to be possible as this time.
 
-**`Function`, `Promise`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
+- **`Function`, `Promise`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
 
-**`Proxy`**: Proxies will not be detected and will not be preserved while cloning.
+- **`Proxy`**: Proxies will not be detected and will not be preserved while cloning.
 
 
 
