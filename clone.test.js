@@ -14,29 +14,6 @@ function testCustomProps(get_uncloned) {
   });
 }
 
-function testTypedArray(constructor, sample_value) {
-  it('empty', () => {
-    const array = new constructor(100);
-    const array_c = clone(array);
-    expect(array_c).toStrictEqual(array);
-    expect(array_c).not.toBe(array);
-  });
-
-  it('nonempty', () => {
-    const array = new constructor(100);
-    array[0] = sample_value;
-    const array_c = clone(array);
-    expect(array_c).toStrictEqual(array);
-    expect(array_c).not.toBe(array);
-  });
-
-  testCustomProps(() => {
-    const array = new constructor(100);
-    array[0] = sample_value;
-    return array;
-  });
-}
-
 describe('true clone', () => {
 
   describe('primitives', () => {
@@ -115,52 +92,13 @@ describe('true clone', () => {
 
     });
 
-    describe('ArrayBuffer', () => {
-      it('simple', () => {
-        const buffer = new ArrayBuffer(32);
-        const view = new DataView(buffer);
-        const buffer_c = clone(buffer);
-        const c_view = new DataView(buffer_c);
-        c_view.setInt16(0, 12);
-        expect(Object.is(buffer_c, buffer)).toBe(false);
-        expect(view.getInt16(0)).not.toBe(12);
-      });
-
-      testCustomProps(() => new ArrayBuffer(16));
-    });
-
     it('BigInt', () => {
       expect(clone(0n)).toStrictEqual(0n);
       expect(clone(100n)).toStrictEqual(100n);
       expect(clone(-100n)).toStrictEqual(-100n);
     });
 
-    describe('BigInt64Array', () => {
-      testTypedArray(BigInt64Array, 12n);
-    });
-
-    describe('BigUint64Array', () => {
-      testTypedArray(BigUint64Array, 12n);
-    });
-
     it('Boolean', () => { });
-
-    describe('DataView', () => {
-      it('simple', () => {
-        const buffer = new ArrayBuffer(32);
-        const view = new DataView(buffer, 1, 16);
-        const view_c = clone(view);
-        expect(view_c.byteOffset).toStrictEqual(view.byteOffset);
-        expect(view_c.byteLength).toStrictEqual(view.byteLength);
-        expect(Object.is(view_c.buffer, view.buffer)).toBe(false);
-        expect(Object.is(view_c, view)).toBe(false);
-        view_c.setInt16(0, 12);
-        expect(view.getInt16(0)).not.toBe(12);
-        expect(view.getInt16(1)).not.toBe(12);
-      });
-
-      testCustomProps(() => new DataView(new ArrayBuffer(16)));
-    });
 
     describe('Date', () => {
       it('simple', () => {
@@ -172,29 +110,9 @@ describe('true clone', () => {
       testCustomProps(() => new Date());
     });
 
-    describe('Float32Array', () => {
-      testTypedArray(Float32Array, 3.14);
-    });
-
-    describe('Float64Array', () => {
-      testTypedArray(Float64Array, 3.14);
-    });
-
     it('Function', () => {
       const f = () => {};
       expect(clone(f)).toBe(f);
-    });
-
-    describe('Int8Array', () => {
-      testTypedArray(Int8Array, 12);
-    });
-
-    describe('Int16Array', () => {
-      testTypedArray(Int16Array, 12);
-    });
-
-    describe('Int32Array', () => {
-      testTypedArray(Int32Array, 12);
     });
 
     describe('Map', () => {
@@ -263,10 +181,6 @@ describe('true clone', () => {
       testCustomProps(() => new Set([1, 2, 3]));
     });
 
-    describe('SharedArrayBuffer', () => {
-      // Doesn't really seem to be any way to test these? :/
-    });
-
     describe('String', () => {
       it('simple', () => {
         const string = new String('string');
@@ -281,6 +195,94 @@ describe('true clone', () => {
     it('Symbol', () => {
       const s = Symbol('s');
       expect(clone(s)).toBe(s);
+    });
+
+    // == TYPED ARRAYS ET AL == //
+
+    describe('ArrayBuffer', () => {
+      it('simple', () => {
+        const buffer = new ArrayBuffer(32);
+        const view = new DataView(buffer);
+        const buffer_c = clone(buffer);
+        const c_view = new DataView(buffer_c);
+        c_view.setInt16(0, 12);
+        expect(Object.is(buffer_c, buffer)).toBe(false);
+        expect(view.getInt16(0)).not.toBe(12);
+      });
+
+      testCustomProps(() => new ArrayBuffer(16));
+    });
+
+    describe('SharedArrayBuffer', () => {
+      // Doesn't really seem to be any way to test these? :/
+    });
+
+    describe('DataView', () => {
+      it('simple', () => {
+        const buffer = new ArrayBuffer(32);
+        const view = new DataView(buffer, 1, 16);
+        const view_c = clone(view);
+        expect(view_c.byteOffset).toStrictEqual(view.byteOffset);
+        expect(view_c.byteLength).toStrictEqual(view.byteLength);
+        expect(Object.is(view_c.buffer, view.buffer)).toBe(false);
+        expect(Object.is(view_c, view)).toBe(false);
+        view_c.setInt16(0, 12);
+        expect(view.getInt16(0)).not.toBe(12);
+        expect(view.getInt16(1)).not.toBe(12);
+      });
+
+      testCustomProps(() => new DataView(new ArrayBuffer(16)));
+    });
+
+    function testTypedArray(constructor, sample_value) {
+      it('empty', () => {
+        const array = new constructor(100);
+        const array_c = clone(array);
+        expect(array_c).toStrictEqual(array);
+        expect(array_c).not.toBe(array);
+      });
+
+      it('nonempty', () => {
+        const array = new constructor(100);
+        array[0] = sample_value;
+        const array_c = clone(array);
+        expect(array_c).toStrictEqual(array);
+        expect(array_c).not.toBe(array);
+      });
+
+      testCustomProps(() => {
+        const array = new constructor(100);
+        array[0] = sample_value;
+        return array;
+      });
+    }
+
+    describe('BigInt64Array', () => {
+      testTypedArray(BigInt64Array, 12n);
+    });
+
+    describe('BigUint64Array', () => {
+      testTypedArray(BigUint64Array, 12n);
+    });
+
+    describe('Float32Array', () => {
+      testTypedArray(Float32Array, 3.14);
+    });
+
+    describe('Float64Array', () => {
+      testTypedArray(Float64Array, 3.14);
+    });
+
+    describe('Int8Array', () => {
+      testTypedArray(Int8Array, 12);
+    });
+
+    describe('Int16Array', () => {
+      testTypedArray(Int16Array, 12);
+    });
+
+    describe('Int32Array', () => {
+      testTypedArray(Int32Array, 12);
     });
 
     describe('Uint8Array', () => {
@@ -298,6 +300,8 @@ describe('true clone', () => {
     describe('Uint32Array', () => {
       testTypedArray(Uint32Array, 12);
     });
+
+    // == ERRORS == //
 
     it('Error', () => { });
 

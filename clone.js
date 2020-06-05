@@ -33,6 +33,8 @@ function mirror(source, result, clone) {
 // This may be overkill, but it will probably handle all needed cases
 const cloners = new Map();
 
+// == SPECIAL CLONERS == //
+
 cloners.set(Array.prototype, function(source, cache, clone) {
   const result = new Array(source.length);
   cache.set(source, result);
@@ -43,38 +45,14 @@ cloners.set(Array.prototype, function(source, cache, clone) {
   return result;
 });
 
-cloners.set(ArrayBuffer.prototype, function(source, cache, clone) {
-  const result = source.slice();
-  mirror(source, result, clone);
-  return result;
-});
-
 cloners.set(BigInt.prototype, function(source, cache, clone) {
   // BigInt objects appear to be immutable
   return source;
 });
 
-cloners.set(BigInt64Array.prototype, function(source, cache, clone) {
-  const result = new BigInt64Array(source);
-  mirror(source, result, clone);
-  return result;
-});
-
-cloners.set(BigUint64Array.prototype, function(source, cache, clone) {
-  const result = new BigUint64Array(source);
-  mirror(source, result, clone);
-  return result;
-});
-
 cloners.set(Boolean.prototype, function(source, cache, clone) {
   // Boolean objects appear to be immutable
   return source;
-});
-
-cloners.set(DataView.prototype, function(source, cache, clone) {
-  const result = new DataView(clone(source.buffer), source.byteOffset, source.byteLength);
-  mirror(source, result, clone);
-  return result;
 });
 
 cloners.set(Date.prototype, function(source, cache, clone) {
@@ -91,39 +69,9 @@ cloners.set(Date.prototype, function(source, cache, clone) {
   return result;
 });
 
-cloners.set(Float32Array.prototype, function(source, cache, clone) {
-  const result = new Float32Array(source);
-  mirror(source, result, clone);
-  return result;
-});
-
-cloners.set(Float64Array.prototype, function(source, cache, clone) {
-  const result = new Float64Array(source);
-  mirror(source, result, clone);
-  return result;
-});
-
 cloners.set(Function.prototype, function(source, cache, clone) {
   // Functions are mutable but cannot be cloned :(
   return source;
-});
-
-cloners.set(Int8Array.prototype, function(source, cache, clone) {
-  const result = new Int8Array(source);
-  mirror(source, result, clone);
-  return result;
-});
-
-cloners.set(Int16Array.prototype, function(source, cache, clone) {
-  const result = new Int16Array(source);
-  mirror(source, result, clone);
-  return result;
-});
-
-cloners.set(Int32Array.prototype, function(source, cache, clone) {
-  const result = new Int32Array(source);
-  mirror(source, result, clone);
-  return result;
 });
 
 cloners.set(Map.prototype, function(source, cache, clone) {
@@ -171,12 +119,6 @@ cloners.set(Set.prototype, function(source, cache, clone) {
   return result;
 });
 
-cloners.set(SharedArrayBuffer.prototype, function(source, cache, clone) {
-  const result = source.slice();
-  mirror(source, result, clone);
-  return result;
-});
-
 cloners.set(String.prototype, function(source, cache, clone) {
   const result = new String(source);
   mirror(source, result, clone);
@@ -186,6 +128,78 @@ cloners.set(String.prototype, function(source, cache, clone) {
 cloners.set(Symbol.prototype, function(source, cache, clone) {
   // Symbols are immutable: https://tc39.es/ecma262/#sec-ecmascript-language-types-symbol-type
   return source;
+});
+
+cloners.set(WeakMap.prototype, function(source, cache, clone) {
+  // WeakMaps cannot be cloned :(
+  return source;
+});
+
+cloners.set(WeakSet.prototype, function(source, cache, clone) {
+  //WeakSets cannot be cloned :(
+  return source;
+});
+
+// == TYPED ARRAYS ET AL == //
+
+cloners.set(ArrayBuffer.prototype, function(source, cache, clone) {
+  const result = source.slice();
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(SharedArrayBuffer.prototype, function(source, cache, clone) {
+  const result = source.slice();
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(DataView.prototype, function(source, cache, clone) {
+  const result = new DataView(clone(source.buffer), source.byteOffset, source.byteLength);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(BigInt64Array.prototype, function(source, cache, clone) {
+  const result = new BigInt64Array(source);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(BigUint64Array.prototype, function(source, cache, clone) {
+  const result = new BigUint64Array(source);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Float32Array.prototype, function(source, cache, clone) {
+  const result = new Float32Array(source);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Float64Array.prototype, function(source, cache, clone) {
+  const result = new Float64Array(source);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Int8Array.prototype, function(source, cache, clone) {
+  const result = new Int8Array(source);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Int16Array.prototype, function(source, cache, clone) {
+  const result = new Int16Array(source);
+  mirror(source, result, clone);
+  return result;
+});
+
+cloners.set(Int32Array.prototype, function(source, cache, clone) {
+  const result = new Int32Array(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Uint8Array.prototype, function(source, cache, clone) {
@@ -210,16 +224,6 @@ cloners.set(Uint32Array.prototype, function(source, cache, clone) {
   const result = new Uint32Array(source);
   mirror(source, result, clone);
   return result;
-});
-
-cloners.set(WeakMap.prototype, function(source, cache, clone) {
-  // WeakMaps cannot be cloned :(
-  return source;
-});
-
-cloners.set(WeakSet.prototype, function(source, cache, clone) {
-  //WeakSets cannot be cloned :(
-  return source;
 });
 
 // == ERRORS == //
