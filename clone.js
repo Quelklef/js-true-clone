@@ -122,6 +122,9 @@ cloners.set(Object.prototype, function(source, cache, clone) {
 });
 
 cloners.set(RegExp.prototype, function(source, cache, clone) {
+  const result = new RegExp(source);
+  mirror(source, result, clone);
+  return result;
 });
 
 cloners.set(Set.prototype, function(source, cache, clone) {

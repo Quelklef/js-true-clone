@@ -191,7 +191,16 @@ describe('true clone', () => {
       testCustomProps(() => new Number(3.14));
     });
 
-    it('RegExp', () => { });
+    describe('RegExp', () => {
+      it('simple', () => {
+        const reg = /x/g;
+        const reg_c = clone(reg);
+        expect(reg).toStrictEqual(reg_c);
+        expect(Object.is(reg, reg_c)).toBe(false);
+      });
+
+      testCustomProps(() => /x/g);
+    });
 
     describe('Set', () => {
       test('simple', () => {
