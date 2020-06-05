@@ -1,5 +1,5 @@
 
-const { clone, custom_clone } = require('./clone.js');
+module.exports = { shared_tests };
 
 class AssertionError extends Error { }
 
@@ -47,7 +47,7 @@ function test(name, body) {
 // TODO: develop a true-equals package for true object equality
 //       on the same lines as this package
 
-within('true clone', () => {
+function shared_tests(clone) {
 
   within('primitives', () => {
 
@@ -634,6 +634,12 @@ within('true clone', () => {
 
   });
 
+}
+
+function true_clone_tests(package) {
+
+  const { clone, custom_clone } = package;
+
   within('allows for custom cloners', () => {
     test('on objects', () => {
       const object = {
@@ -655,4 +661,11 @@ within('true clone', () => {
     });
   });
 
-});
+};
+
+// if main module
+if (!module.parent) {
+  const true_clone = require('./clone.js');
+  shared_tests(true_clone.clone);
+  true_clone_tests(true_clone);
+}
