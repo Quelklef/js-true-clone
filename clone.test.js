@@ -1,26 +1,65 @@
 
 const { clone, custom_clone } = require('./clone.js');
 
+class AssertionError extends Error { }
+
 function assert(bool) {
-  if (!bool) throw new Error('assertion failed');
+  if (!bool) throw new AssertionError('assertion failed');
+}
+
+const context = [];
+function within(name, body) {
+  context.push(name);
+  body();
+  context.pop();
+}
+
+function test(name, body) {
+
+  let succeeded;
+
+  try {
+    body();
+    succeeded = true;
+  } catch (e) {
+    if (e instanceof AssertionError) {
+      succeeded = false;
+    } else {
+      throw e;
+    }
+  }
+
+  // from https://stackoverflow.com/a/41407246/4608364
+  const c_reset = "\x1b[0m";
+  const c_bright = "\x1b[1m";
+  const c_red = "\x1b[31m";
+  const c_green = "\x1b[32m";
+
+  const mark = succeeded ? '+' : '-';
+  const color = succeeded ? c_green : c_bright + c_red;
+  const full_name = [...context, name].join(' > ');
+  const text = `${color}[${mark}] ${full_name}${c_reset}`;
+
+  console.log(text);
+
 }
 
 // TODO: develop a true-equals package for true object equality
 //       on the same lines as this package
 
-describe('true clone', () => {
+within('true clone', () => {
 
-  describe('primitives', () => {
+  within('primitives', () => {
 
-    it('null', () => {
+    test('null', () => {
       assert(clone(null) === null);
     });
 
-    it('undefined', () => {
+    test('undefined', () => {
       assert(clone(undefined) === undefined);
     });
 
-    it('number', () => {
+    test('number', () => {
       assert(clone(1) === 1);
       assert(clone(-1) === -1);
       assert(clone(3.75) === 3.75);
@@ -29,22 +68,22 @@ describe('true clone', () => {
       assert(Number.isNaN(clone(Number.NaN)));
     });
 
-    it('string', () => {
+    test('string', () => {
       assert(clone('') === '');
       assert(clone('string') === 'string');
     });
 
-    it('boolean', () => {
+    test('boolean', () => {
       assert(clone(false) === false);
       assert(clone(true) === true);
     });
 
-    it('symbol', () => {
+    test('symbol', () => {
       const symbol = Symbol();
       assert(clone(symbol) === symbol);
     });
 
-    it('bigint', () => {
+    test('bigint', () => {
       assert(clone(0n) === 0n);
       assert(clone(100n) === 100n);
       assert(clone(-100n) === -100n);
@@ -53,7 +92,7 @@ describe('true clone', () => {
   });
 
   function testMonkeypatching(object, matches) {
-    it('monkeypatched', () => {
+    test('monkeypatched', () => {
       const prop_name = Symbol();
       object[prop_name] = 'prop val';
       const cloned = clone(object);
@@ -64,14 +103,14 @@ describe('true clone', () => {
     });
   }
 
-  describe('object types', () => {
+  within('object types', () => {
 
-    describe('Number', () => {
+    within('Number', () => {
       function Number_matches(number_1, number_2) {
         return number_1 !== number_2 && +number_1 === +number_2;
       }
 
-      it('simple', () => {
+      test('simple', () => {
         const number = new Number(3.14);
         assert(Number_matches(number, clone(number)));
       });
@@ -79,12 +118,12 @@ describe('true clone', () => {
       testMonkeypatching(new Number(3.14), Number_matches);
     });
 
-    describe('String', () => {
+    within('String', () => {
       function String_matches(str1, str2) {
         return str1 !== str2 && '' + str1 === '' + str2;
       }
 
-      it('simple', () => {
+      test('simple', () => {
         const string = new String('string');
         assert(String_matches(string, clone(string)));
       });
@@ -92,15 +131,15 @@ describe('true clone', () => {
       testMonkeypatching(new String('imastring'), String_matches);
     });
 
-    it('Boolean', () => {
+    test('Boolean', () => {
     });
 
-    describe('Date', () => {
+    within('Date', () => {
       function Date_matches(date1, date2) {
         return date1 !== date2 && date1.toISOString() == date2.toISOString();
       }
 
-      it('simple', () => {
+      test('simple', () => {
         const now = new Date();
         assert(Date_matches(now, clone(now)));
       });
@@ -108,13 +147,13 @@ describe('true clone', () => {
       testMonkeypatching(new Date(), Date_matches);
     });
 
-    it('Function', () => {
+    test('Function', () => {
     });
 
-    it('Promise', () => {
+    test('Promise', () => {
     });
 
-    describe('RegExp', () => {
+    within('RegExp', () => {
       function RegExp_matches(reg1, reg2) {
         return (
           reg1 !== reg2
@@ -130,7 +169,7 @@ describe('true clone', () => {
         );
       }
 
-      it('simple', () => {
+      test('simple', () => {
         const reg = /x/g;
         assert(RegExp_matches(reg, clone(reg)));
       });
@@ -140,9 +179,9 @@ describe('true clone', () => {
 
   });
 
-  describe('container types', () => {
+  within('container types', () => {
 
-    describe('Array', () => {
+    within('Array', () => {
 
       function Array_matches(ar1, ar2) {
         // contents equality tested with ===
@@ -164,22 +203,22 @@ describe('true clone', () => {
         return true;
       }
 
-      it('empty', () => {
+      test('empty', () => {
         const empty = [];
         assert(Array_matches(empty, clone(empty)));
       });
 
-      it('nonempty', () => {
+      test('nonempty', () => {
         const nonempty = [Number.INFINITY, 0, undefined, Symbol(), 12n];
         assert(Array_matches(nonempty, clone(nonempty)));
       });
 
-      it('nested', () => {
+      test('nested', () => {
         const nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
         assert(Array_matches(nested, clone(nested)));
       });
 
-      it('cyclic', () => {
+      test('cyclic', () => {
         const cyclic = ['before', undefined, 'after'];
         cyclic[1] = cyclic;
         const cloned = clone(cyclic);
@@ -188,7 +227,7 @@ describe('true clone', () => {
         assert(cloned[2] === 'after');
       });
 
-      it('diamond-shaped', () => {
+      test('diamond-shaped', () => {
         const child = ['im', 'child'];
         const parent = ['before', child, 'between', child, 'after'];
         const cloned = clone(parent);
@@ -201,7 +240,7 @@ describe('true clone', () => {
 
     });
 
-    describe('Map', () => {
+    within('Map', () => {
 
       function Map_matches(map1, map2) {
         if (map1 === map2 || map1.size !== map2.size)
@@ -222,22 +261,22 @@ describe('true clone', () => {
         return true;
       }
 
-      it('empty', () => {
+      test('empty', () => {
         const empty = new Map();
         assert(Map_matches(empty, clone(empty)));
       });
 
-      it('nonempty', () => {
+      test('nonempty', () => {
         const nonempty = new Map([['ping', 'x'], ['y', 'pong']]);
         assert(Map_matches(nonempty, clone(nonempty)));
       });
 
-      it('nested', () => {
+      test('nested', () => {
         const nested = new Map([['m', new Map([['mx', 0]])]]);
         assert(Map_matches(nested, clone(nested)));
       });
 
-      it('cyclic', () => {
+      test('cyclic', () => {
         const cyclic = new Map();
         cyclic.set('self', cyclic);
         const cloned = clone(cyclic);
@@ -246,7 +285,7 @@ describe('true clone', () => {
         assert(cloned.get('self') === cloned);
       });
 
-      it('diamond-shaped', () => {
+      test('diamond-shaped', () => {
         const child = new Map([['i am', 'child']]);
         const diamond = new Map([['a', child], ['b', child]]);
         const cloned = clone(diamond);
@@ -257,7 +296,7 @@ describe('true clone', () => {
 
     });
 
-    describe('Set', () => {
+    within('Set', () => {
 
       function Set_matches(set1, set2) {
         if (set1 === set2 || set1.size !== set2.size)
@@ -275,23 +314,23 @@ describe('true clone', () => {
         return true;
       }
 
-      it('empty', () => {
+      test('empty', () => {
         const empty = new Set([]);
         assert(Set_matches(empty, clone(empty)));
       });
 
-      it('nonempty', () => {
+      test('nonempty', () => {
         const nonempty = new Set([1, 2, 3]);
         assert(Set_matches(nonempty, clone(nonempty)));
       });
 
-      it('nested', () => {
+      test('nested', () => {
         const child = new Set(['child']);
         const parent = new Set([child]);
         assert(Set_matches(parent, clone(parent)));
       });
 
-      it('cyclic', () => {
+      test('cyclic', () => {
         const cyclic = new Set();
         cyclic.add(cyclic);
         const cloned = clone(cyclic);
@@ -299,7 +338,7 @@ describe('true clone', () => {
         assert(cloned.has(cloned));
       });
 
-      it('diamond-shaped', () => {
+      test('diamond-shaped', () => {
         // N/A
       });
 
@@ -307,17 +346,17 @@ describe('true clone', () => {
 
     });
 
-    it('WeakMap', () => {
+    test('WeakMap', () => {
       // TODO
     });
 
-    it('WeakSet', () => {
+    test('WeakSet', () => {
       // TODO
     });
 
   });
 
-  describe('typed arrays et al', () => {
+  within('typed arrays et al', () => {
 
     function ArrayBuffer_matches(ab1, ab2) {
       const view1 = new Int8Array(ab1);
@@ -325,8 +364,8 @@ describe('true clone', () => {
       return TypedArray_matches(view1, view2);
     }
 
-    describe('ArrayBuffer', () => {
-      it('simple', () => {
+    within('ArrayBuffer', () => {
+      test('simple', () => {
         const buffer = new ArrayBuffer(32);
         assert(ArrayBuffer_matches(buffer, clone(buffer)));
       });
@@ -334,7 +373,7 @@ describe('true clone', () => {
       testMonkeypatching(new ArrayBuffer(16), ArrayBuffer_matches);
     });
 
-    describe('SharedArrayBuffer', () => {
+    within('SharedArrayBuffer', () => {
       // Doesn't really seem to be any way to test these? :/
     });
 
@@ -347,8 +386,8 @@ describe('true clone', () => {
       );
     }
 
-    describe('DataView', () => {
-      it('simple', () => {
+    within('DataView', () => {
+      test('simple', () => {
         const buffer = new ArrayBuffer(32);
         const view = new DataView(buffer, 1, 16);
         const cloned = clone(view);
@@ -374,13 +413,13 @@ describe('true clone', () => {
     }
 
     function testTypedArray(constructor, sample_value) {
-      describe(constructor.name, () => {
-        it('empty', () => {
+      within(constructor.name, () => {
+        test('empty', () => {
           const empty = new constructor(32);
           assert(TypedArray_matches(empty, clone(empty)));
         });
 
-        it('nonempty', () => {
+        test('nonempty', () => {
           const nonempty = new constructor(32);
           nonempty[0] = sample_value;
           nonempty[15] = sample_value;
@@ -401,7 +440,7 @@ describe('true clone', () => {
       });
     }
 
-    describe('typed arrays', () => {
+    within('typed arrays', () => {
       testTypedArray(BigInt64Array, 12n);
       testTypedArray(BigUint64Array, 12n);
       testTypedArray(Float32Array, 3.14);
@@ -418,7 +457,7 @@ describe('true clone', () => {
   });
 
   function testError(error) {
-    describe(error.constructor.prototype.name, () => {
+    within(error.constructor.prototype.name, () => {
       function Error_matches(err1, err2) {
         return (
           err1 !== err2
@@ -429,7 +468,7 @@ describe('true clone', () => {
         );
       }
 
-      it('simple', () => {
+      test('simple', () => {
         assert(Error_matches(error, clone(error)));
       });
 
@@ -437,7 +476,7 @@ describe('true clone', () => {
     });
   }
 
-  describe('errors', () => {
+  within('errors', () => {
     testError(new Error('message', 'filename', 50));
     testError(new EvalError('message', 'filename', 50));
     testError(new RangeError('message', 'filename', 50));
@@ -447,7 +486,7 @@ describe('true clone', () => {
     testError(new URIError('message', 'filename', 50));
   });
 
-  describe('plain and custom objects', () => {
+  within('plain and custom objects', () => {
 
     function Object_matches(obj1, obj2) {
 
@@ -497,22 +536,22 @@ describe('true clone', () => {
 
     }
 
-    it('empty', () => {
+    test('empty', () => {
       const empty = {};
       assert(Object_matches(empty, clone(empty)));
     });
 
-    it('nonempty', () => {
+    test('nonempty', () => {
       const nonempty = { left: 'right', up: 'down', red: 'blue' };
       assert(Object_matches(nonempty, clone(nonempty)));
     });
 
-    it('nested', () => {
+    test('nested', () => {
       const nested = { child: { val: 'val!' } };
       assert(Object_matches(nested, clone(nested)));
     });
 
-    it('cyclic', () => {
+    test('cyclic', () => {
       const object = { };
       object.self = object;
       const cloned = clone(object);
@@ -520,7 +559,7 @@ describe('true clone', () => {
       assert(cloned.self === cloned);
     });
 
-    it('diamond-shaped', () => {
+    test('diamond-shaped', () => {
       const child = { i_am: 'child' };
       const parent = { left: child, right: child };
       const cloned = clone(parent);
@@ -528,13 +567,13 @@ describe('true clone', () => {
       assert(cloned.left === cloned.right);
     });
 
-    it('with non-string keys', () => {
+    test('with non-string keys', () => {
       const key = Symbol();
       const nonempty = { [key]: 'val' };
       assert(Object_matches(nonempty, clone(nonempty)));
     });
 
-    it('function prototype instances with no hierarchy', () => {
+    test('function prototype instances with no hierarchy', () => {
       function Pair(left, right) {
         this.left = left;
         this.right = right;
@@ -543,7 +582,7 @@ describe('true clone', () => {
       assert(Object_matches(pair, clone(pair)));
     });
 
-    it('with prototype from Object.create', () => {
+    test('with prototype from Object.create', () => {
       const proto = {
         delimiter: ', ',
         toString() {
@@ -555,7 +594,7 @@ describe('true clone', () => {
       assert(Object_matches(object, clone(object)));
     });
 
-    it('ES6 class instances with no hierarchy', () => {
+    test('ES6 class instances with no hierarchy', () => {
       class Pair {
         constructor(left, right) {
           this.left = left;
@@ -566,7 +605,7 @@ describe('true clone', () => {
       assert(Object_matches(pair, clone(pair)));
     });
 
-    it('ES6 classes with hierarchy', () => {
+    test('ES6 classes with hierarchy', () => {
       class Parent {
         constructor(p_val) {
           this.p_val = p_val;
@@ -582,7 +621,7 @@ describe('true clone', () => {
       assert(Object_matches(child, clone(child)));
     });
 
-    it('with getters', () => {
+    test('with getters', () => {
       const object = { val: 'got' };
       Object.defineProperty(object, 'getter', {
         get() { return this.val; }
@@ -595,8 +634,8 @@ describe('true clone', () => {
 
   });
 
-  describe('allows for custom cloners', () => {
-    it('on objects', () => {
+  within('allows for custom cloners', () => {
+    test('on objects', () => {
       const object = {
         [custom_clone]() {
           return 10;
@@ -605,7 +644,7 @@ describe('true clone', () => {
       assert(clone(object) === 10);
     });
 
-    it('on prototypes', () => {
+    test('on prototypes', () => {
       class Class {
         [custom_clone]() {
           return 10;
