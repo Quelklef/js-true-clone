@@ -1,6 +1,6 @@
 # js-true-clone
 
-The goal of this package is to get as close as possible to a perfect value clone in JS, being aware of prototypes, getters & setters, etc.
+The goal of this package is to get as close as possible to a perfect JS value clone.
 
 ## Usage
 
@@ -15,6 +15,18 @@ const { clone } = require('true-clone');
 // later ...
 const cloned = clone(my_object);
 ```
+
+## Behaviour
+
+The cloning algorithm is pretty smart and is aware of:
+- Native JS types! This includes primitives, `Array`, `Set`, `Map`, boxed primitives, typed arrays, etc.
+- Prototypes! Finally, you can clone custom classes!
+- Getters! These will be replicated on the result as getters, not as the computed value.
+- Setters! These will be replicated on the result.
+- Custom properties on native types! For instance: `const ar = []; ar.my = 'prop'; console.assert(clone(ar).my === 'prop')`.
+- (Non-)enumerability, (non-)configurability, and/or (non-)writability of object properties! These will be respected.
+
+Additionally, custom cloning algorithms are supported if needed; see the *Custom cloning* section.
 
 ## Versioning
 
