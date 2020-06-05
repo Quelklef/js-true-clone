@@ -25,6 +25,7 @@ The cloning algorithm is pretty smart and is aware of:
 - Setters! These will be replicated on the result.
 - Custom properties on native types! For instance: `const ar = []; ar.my = 'prop'; console.assert(clone(ar).my === 'prop')`.
 - (Non-)enumerability, (non-)configurability, and/or (non-)writability of object properties! These will be respected.
+- etc.
 
 Additionally, custom cloning algorithms are supported if needed; see the *Custom cloning* section.
 
