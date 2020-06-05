@@ -12,7 +12,7 @@ then
 
 ```js
 const { clone } = require('true-clone');
-# later ...
+// later ...
 const cloned = clone(my_object);
 ```
 
