@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Quelklef/true-clone.git"
+    "url": "git+https://github.com/Quelklef/js-true-clone.git"
   },
   "keywords": [
     "deep",
@@ -22,9 +22,9 @@
   "author": "Quelklef",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Quelklef/true-clone/issues"
+    "url": "https://github.com/Quelklef/js-true-clone/issues"
   },
-  "homepage": "https://github.com/Quelklef/true-clone#readme",
+  "homepage": "https://github.com/Quelklef/js-true-clone#readme",
   "devDependencies": {
     "jest": "^26.0.1"
   }
