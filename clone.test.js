@@ -197,6 +197,16 @@ describe('true clone', () => {
       expect(clone(s)).toBe(s);
     });
 
+    it('WeakMap', () => {
+      const wm = new WeakMap();
+      expect(clone(wm)).toBe(wm);
+    });
+
+    it('WeakSet', () => {
+      const ws = new WeakSet();
+      expect(clone(ws)).toBe(ws);
+    });
+
     // == TYPED ARRAYS ET AL == //
 
     describe('ArrayBuffer', () => {
