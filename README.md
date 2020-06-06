@@ -47,7 +47,8 @@ Where *caveat* means incorrect behaviour due to JS limitations.
 
 Where *gotcha* means behaviour that isn't wrong but may be surprising or undesirable.
 
-- **Monkeypatching methods**: Cloning bound functions can cause some undesirable behaviour relating to monkeypatching methods:
+<details>
+<summary><b>Monkeypatching methods</b>: cloning an object with monkeypatched methods can cause surprising behaviour if the method has been eagerly bound.</summary>
 
 ```js
 const list = ['i', 'am'];
@@ -92,6 +93,7 @@ list.toString = function() {
 ```
 
 Another fix is to use prototyping instead of monkeypatching.
+</details>
 
 
 ## Custom cloning
