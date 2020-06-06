@@ -1,6 +1,6 @@
 {
   "name": "true-clone",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "A deep cloning algorithm aware of prototypes, getters/setters, etc.",
   "main": "clone.js",
   "scripts": {
@@ -25,9 +25,9 @@
     "url": "https://github.com/Quelklef/js-true-clone/issues"
   },
   "homepage": "https://github.com/Quelklef/js-true-clone#readme",
-  "devDependencies": {},
-  "dependencies": {
+  "devDependencies": {
     "clone": "^2.1.2",
     "lodash.clonedeep": "^4.5.0"
-  }
+  },
+  "dependencies": {}
 }
