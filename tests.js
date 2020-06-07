@@ -91,12 +91,12 @@ function shared_tests(clone) {
 
   });
 
-  function testMonkeypatching(object, matches) {
+  function testMonkeypatching(object, alike) {
     test('monkeypatched', () => {
       const prop_name = Symbol();
       object[prop_name] = 'prop val';
       const cloned = clone(object);
-      assert(matches(cloned, object));
+      assert(alike(cloned, object));
       assert(cloned[prop_name] === object[prop_name]);
       cloned[prop_name] = 'different';
       assert(cloned[prop_name] !== object[prop_name]);
@@ -106,55 +106,55 @@ function shared_tests(clone) {
   within('object types', () => {
 
     within('Number', () => {
-      function Number_matches(number_1, number_2) {
+      function Number_alike(number_1, number_2) {
         return number_1 !== number_2 && +number_1 === +number_2;
       }
 
       test('simple', () => {
         const number = new Number(3.14);
-        assert(Number_matches(number, clone(number)));
+        assert(Number_alike(number, clone(number)));
       });
 
-      testMonkeypatching(new Number(3.14), Number_matches);
+      testMonkeypatching(new Number(3.14), Number_alike);
     });
 
     within('String', () => {
-      function String_matches(str1, str2) {
+      function String_alike(str1, str2) {
         return str1 !== str2 && '' + str1 === '' + str2;
       }
 
       test('simple', () => {
         const string = new String('string');
-        assert(String_matches(string, clone(string)));
+        assert(String_alike(string, clone(string)));
       });
 
-      testMonkeypatching(new String('imastring'), String_matches);
+      testMonkeypatching(new String('imastring'), String_alike);
     });
 
     within('Boolean', () => {
-      function Boolean_matches(bool1, bool2) {
+      function Boolean_alike(bool1, bool2) {
         return bool1 !== bool2 && !!bool1 === !!bool2;
       }
 
       test('simple', () => {
         const boolean = new Boolean(true);
-        assert(Boolean_matches(boolean, clone(boolean)));
+        assert(Boolean_alike(boolean, clone(boolean)));
       });
 
-      testMonkeypatching(new Boolean(true), Boolean_matches);
+      testMonkeypatching(new Boolean(true), Boolean_alike);
     });
 
     within('Date', () => {
-      function Date_matches(date1, date2) {
+      function Date_alike(date1, date2) {
         return date1 !== date2 && date1.toISOString() == date2.toISOString();
       }
 
       test('simple', () => {
         const now = new Date();
-        assert(Date_matches(now, clone(now)));
+        assert(Date_alike(now, clone(now)));
       });
 
-      testMonkeypatching(new Date(), Date_matches);
+      testMonkeypatching(new Date(), Date_alike);
     });
 
     within('Function', () => {
@@ -167,7 +167,7 @@ function shared_tests(clone) {
     });
 
     within('RegExp', () => {
-      function RegExp_matches(reg1, reg2) {
+      function RegExp_alike(reg1, reg2) {
         return (
           reg1 !== reg2
           && reg1.lastIndex === reg2.lastIndex
@@ -184,10 +184,10 @@ function shared_tests(clone) {
 
       test('simple', () => {
         const reg = /x/g;
-        assert(RegExp_matches(reg, clone(reg)));
+        assert(RegExp_alike(reg, clone(reg)));
       });
 
-      testMonkeypatching(/x/g, RegExp_matches);
+      testMonkeypatching(/x/g, RegExp_alike);
     });
 
   });
@@ -196,7 +196,7 @@ function shared_tests(clone) {
 
     within('Array', () => {
 
-      function Array_matches(ar1, ar2) {
+      function Array_alike(ar1, ar2) {
         // contents equality tested with ===
         // except for in the case of nested arrays
         if (ar1 === ar2 || ar1.length !== ar2.length)
@@ -207,7 +207,7 @@ function shared_tests(clone) {
           const val2 = ar2[i];
           const are_equal =
             val1 instanceof Array
-              ? val2 instanceof Array && Array_matches(val1, val2)
+              ? val2 instanceof Array && Array_alike(val1, val2)
               : val1 === val2;
 
           if (!are_equal) return false;
@@ -218,17 +218,17 @@ function shared_tests(clone) {
 
       test('empty', () => {
         const empty = [];
-        assert(Array_matches(empty, clone(empty)));
+        assert(Array_alike(empty, clone(empty)));
       });
 
       test('nonempty', () => {
         const nonempty = [Number.INFINITY, 0, undefined, Symbol(), 12n];
-        assert(Array_matches(nonempty, clone(nonempty)));
+        assert(Array_alike(nonempty, clone(nonempty)));
       });
 
       test('nested', () => {
         const nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
-        assert(Array_matches(nested, clone(nested)));
+        assert(Array_alike(nested, clone(nested)));
       });
 
       test('cyclic', () => {
@@ -244,18 +244,18 @@ function shared_tests(clone) {
         const child = ['im', 'child'];
         const parent = ['before', child, 'between', child, 'after'];
         const cloned = clone(parent);
-        assert(Array_matches(parent, cloned));
+        assert(Array_alike(parent, cloned));
         assert(parent[1] !== cloned[1]);
         assert(cloned[1] === cloned[3]);
       });
 
-      testMonkeypatching([3, 1, 4], Array_matches);
+      testMonkeypatching([3, 1, 4], Array_alike);
 
     });
 
     within('Map', () => {
 
-      function Map_matches(map1, map2) {
+      function Map_alike(map1, map2) {
         if (map1 === map2 || map1.size !== map2.size)
           return false;
 
@@ -265,7 +265,7 @@ function shared_tests(clone) {
           const val2 = map2.get(key);
           const are_equal =
             val1 instanceof Map
-              ? val2 instanceof Map && Map_matches(val1, val2)
+              ? val2 instanceof Map && Map_alike(val1, val2)
               : val1 === val2;
 
           if (!are_equal) return false;
@@ -276,17 +276,17 @@ function shared_tests(clone) {
 
       test('empty', () => {
         const empty = new Map();
-        assert(Map_matches(empty, clone(empty)));
+        assert(Map_alike(empty, clone(empty)));
       });
 
       test('nonempty', () => {
         const nonempty = new Map([['ping', 'x'], ['y', 'pong']]);
-        assert(Map_matches(nonempty, clone(nonempty)));
+        assert(Map_alike(nonempty, clone(nonempty)));
       });
 
       test('nested', () => {
         const nested = new Map([['m', new Map([['mx', 0]])]]);
-        assert(Map_matches(nested, clone(nested)));
+        assert(Map_alike(nested, clone(nested)));
       });
 
       test('cyclic', () => {
@@ -302,23 +302,23 @@ function shared_tests(clone) {
         const child = new Map([['i am', 'child']]);
         const diamond = new Map([['a', child], ['b', child]]);
         const cloned = clone(diamond);
-        assert(Map_matches(diamond, cloned));
+        assert(Map_alike(diamond, cloned));
       });
 
-      testMonkeypatching(new Map([['ping', 'x'], ['y', 'pong']]), Map_matches);
+      testMonkeypatching(new Map([['ping', 'x'], ['y', 'pong']]), Map_alike);
 
     });
 
     within('Set', () => {
 
-      function Set_matches(set1, set2) {
+      function Set_alike(set1, set2) {
         if (set1 === set2 || set1.size !== set2.size)
           return false;
 
         for (const item of set1) {
           const is_contained =
             item instanceof Set
-              ? [...set2].some(s => s instanceof Set && Set_matches(item, s))
+              ? [...set2].some(s => s instanceof Set && Set_alike(item, s))
               : set2.has(item);
 
           if (!is_contained) return false;
@@ -329,18 +329,18 @@ function shared_tests(clone) {
 
       test('empty', () => {
         const empty = new Set([]);
-        assert(Set_matches(empty, clone(empty)));
+        assert(Set_alike(empty, clone(empty)));
       });
 
       test('nonempty', () => {
         const nonempty = new Set([1, 2, 3]);
-        assert(Set_matches(nonempty, clone(nonempty)));
+        assert(Set_alike(nonempty, clone(nonempty)));
       });
 
       test('nested', () => {
         const child = new Set(['child']);
         const parent = new Set([child]);
-        assert(Set_matches(parent, clone(parent)));
+        assert(Set_alike(parent, clone(parent)));
       });
 
       test('cyclic', () => {
@@ -351,7 +351,7 @@ function shared_tests(clone) {
         assert(cloned.has(cloned));
       });
 
-      testMonkeypatching(new Set([1, 2, 3]), Set_matches);
+      testMonkeypatching(new Set([1, 2, 3]), Set_alike);
 
     });
 
@@ -367,31 +367,31 @@ function shared_tests(clone) {
 
   within('typed arrays et al', () => {
 
-    function ArrayBuffer_matches(ab1, ab2) {
+    function ArrayBuffer_alike(ab1, ab2) {
       const view1 = new Int8Array(ab1);
       const view2 = new Int8Array(ab2);
-      return TypedArray_matches(view1, view2);
+      return TypedArray_alike(view1, view2);
     }
 
     within('ArrayBuffer', () => {
       test('simple', () => {
         const buffer = new ArrayBuffer(32);
-        assert(ArrayBuffer_matches(buffer, clone(buffer)));
+        assert(ArrayBuffer_alike(buffer, clone(buffer)));
       });
 
-      testMonkeypatching(new ArrayBuffer(16), ArrayBuffer_matches);
+      testMonkeypatching(new ArrayBuffer(16), ArrayBuffer_alike);
     });
 
     within('SharedArrayBuffer', () => {
       // Doesn't really seem to be any way to test these? :/
     });
 
-    function DataView_matches(dv1, dv2) {
+    function DataView_alike(dv1, dv2) {
       return (
         dv1 !== dv2
         && dv1.byteOffset === dv2.byteOffset
         && dv1.byteLength === dv2.byteLength
-        && ArrayBuffer_matches(dv1.buffer, dv2.buffer)
+        && ArrayBuffer_alike(dv1.buffer, dv2.buffer)
       );
     }
 
@@ -400,17 +400,17 @@ function shared_tests(clone) {
         const buffer = new ArrayBuffer(32);
         const view = new DataView(buffer, 1, 16);
         const cloned = clone(view);
-        assert(DataView_matches(view, cloned));
+        assert(DataView_alike(view, cloned));
         assert(view.buffer !== cloned.buffer);
         cloned.setInt16(0, 12);
         assert(view.getInt16(0) !== 12);
         assert(view.getInt16(1) !== 12);
       });
 
-      testMonkeypatching(new DataView(new ArrayBuffer(16)), DataView_matches);
+      testMonkeypatching(new DataView(new ArrayBuffer(16)), DataView_alike);
     });
 
-    function TypedArray_matches(ta1, ta2) {
+    function TypedArray_alike(ta1, ta2) {
       if (ta1 === ta2 || ta1.length !== ta2.length)
         return false;
 
@@ -425,7 +425,7 @@ function shared_tests(clone) {
       within(constructor.name, () => {
         test('empty', () => {
           const empty = new constructor(32);
-          assert(TypedArray_matches(empty, clone(empty)));
+          assert(TypedArray_alike(empty, clone(empty)));
         });
 
         test('nonempty', () => {
@@ -433,7 +433,7 @@ function shared_tests(clone) {
           nonempty[0] = sample_value;
           nonempty[15] = sample_value;
           nonempty[31] = sample_value;
-          assert(TypedArray_matches(nonempty, clone(nonempty)));
+          assert(TypedArray_alike(nonempty, clone(nonempty)));
         });
 
         testMonkeypatching(
@@ -444,7 +444,7 @@ function shared_tests(clone) {
             array[31] = sample_value;
             return array;
           })(),
-          TypedArray_matches,
+          TypedArray_alike,
         );
       });
     }
@@ -467,7 +467,7 @@ function shared_tests(clone) {
 
   function testError(error) {
     within(error.constructor.prototype.name, () => {
-      function Error_matches(err1, err2) {
+      function Error_alike(err1, err2) {
         return (
           err1 !== err2
           && err1.constructor == err2.constructor
@@ -478,10 +478,10 @@ function shared_tests(clone) {
       }
 
       test('simple', () => {
-        assert(Error_matches(error, clone(error)));
+        assert(Error_alike(error, clone(error)));
       });
 
-      testMonkeypatching(error, Error_matches);
+      testMonkeypatching(error, Error_alike);
     });
   }
 
@@ -497,7 +497,7 @@ function shared_tests(clone) {
 
   within('plain and custom objects', () => {
 
-    function Object_matches(obj1, obj2) {
+    function Object_alike(obj1, obj2) {
 
       if (obj1 === obj2)
         return false;
@@ -535,7 +535,7 @@ function shared_tests(clone) {
         if (value1_is_obj || value2_is_obj) {
           if (!(value1_is_obj && value2_is_obj))
             return false;
-          return Object_matches(value1, value2);
+          return Object_alike(value1, value2);
         } else {
           return value1 === value2;
         }
@@ -547,17 +547,17 @@ function shared_tests(clone) {
 
     test('empty', () => {
       const empty = {};
-      assert(Object_matches(empty, clone(empty)));
+      assert(Object_alike(empty, clone(empty)));
     });
 
     test('nonempty', () => {
       const nonempty = { left: 'right', up: 'down', red: 'blue' };
-      assert(Object_matches(nonempty, clone(nonempty)));
+      assert(Object_alike(nonempty, clone(nonempty)));
     });
 
     test('nested', () => {
       const nested = { child: { val: 'val!' } };
-      assert(Object_matches(nested, clone(nested)));
+      assert(Object_alike(nested, clone(nested)));
     });
 
     test('cyclic', () => {
@@ -572,14 +572,14 @@ function shared_tests(clone) {
       const child = { i_am: 'child' };
       const parent = { left: child, right: child };
       const cloned = clone(parent);
-      assert(Object_matches(cloned, parent));
+      assert(Object_alike(cloned, parent));
       assert(cloned.left === cloned.right);
     });
 
     test('with non-string keys', () => {
       const key = Symbol();
       const nonempty = { [key]: 'val' };
-      assert(Object_matches(nonempty, clone(nonempty)));
+      assert(Object_alike(nonempty, clone(nonempty)));
     });
 
     test('function prototype instances with no hierarchy', () => {
@@ -588,7 +588,7 @@ function shared_tests(clone) {
         this.right = right;
       }
       const pair = new Pair(3, 4);
-      assert(Object_matches(pair, clone(pair)));
+      assert(Object_alike(pair, clone(pair)));
     });
 
     test('with prototype from Object.create', () => {
@@ -600,7 +600,7 @@ function shared_tests(clone) {
       };
       const object = Object.create(proto);
       object.items = [1, 2, 3];
-      assert(Object_matches(object, clone(object)));
+      assert(Object_alike(object, clone(object)));
     });
 
     test('ES6 class instances with no hierarchy', () => {
@@ -611,7 +611,7 @@ function shared_tests(clone) {
         }
       }
       const pair = new Pair(3, 4);
-      assert(Object_matches(pair, clone(pair)));
+      assert(Object_alike(pair, clone(pair)));
     });
 
     test('ES6 classes with hierarchy', () => {
@@ -627,7 +627,7 @@ function shared_tests(clone) {
         }
       }
       const child = new Child('p_val', 'c_val');
-      assert(Object_matches(child, clone(child)));
+      assert(Object_alike(child, clone(child)));
     });
 
     test('with getters', () => {
@@ -636,7 +636,7 @@ function shared_tests(clone) {
         get() { return this.val; }
       });
       const cloned = clone(object);
-      assert(Object_matches(object, cloned));
+      assert(Object_alike(object, cloned));
       cloned.val = 'tot';
       assert(cloned.getter === 'tot');
     });
