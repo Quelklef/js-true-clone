@@ -32,7 +32,7 @@ Additionally, custom cloning algorithms are supported if needed; see the *Custom
 ## Versioning
 
 The *official* API for this package is to provide a cloning algorithm with perfect behaviour.
-All impefect behaviour, even if documented, is *not* a part of the API and should *not* be relied on.
+All imperfect behaviour, even if documented, is *not* a part of the API and should *not* be relied on.
 Updates to this package will thus almost always be either minor- or patch-level updates.
 
 ## Caveats
