@@ -4,7 +4,7 @@
   "description": "A deep cloning algorithm aware of prototypes, getters/setters, etc.",
   "main": "clone.js",
   "scripts": {
-    "test": "npx jest"
+    "test": "sh ./test.sh"
   },
   "repository": {
     "type": "git",
