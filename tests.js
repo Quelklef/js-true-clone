@@ -203,6 +203,10 @@ function shared_tests(clone) {
           return false;
 
         for (let i = 0; i < ar1.length; i++) {
+          // Account for sparse arrays
+          if (i in ar1 !== i in ar2)
+            return false;
+
           const val1 = ar1[i];
           const val2 = ar2[i];
           const are_equal =
@@ -247,6 +251,11 @@ function shared_tests(clone) {
         assert(Array_alike(parent, cloned));
         assert(parent[1] !== cloned[1]);
         assert(cloned[1] === cloned[3]);
+      });
+
+      test('sparse', () => {
+        const sparse = [1,,3,,5];
+        assert(Array_alike(sparse, clone(sparse)));
       });
 
       testMonkeypatching([3, 1, 4], Array_alike);

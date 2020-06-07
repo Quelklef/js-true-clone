@@ -42,7 +42,8 @@ cloners.set(Array.prototype, function(source, cache, clone) {
   cache.set(source, result);
   mirror(source, result, clone);
   for (let i = 0; i < source.length; i++) {
-    result[i] = clone(source[i]);
+    if (i in source)  // account for sparse arrays
+      result[i] = clone(source[i]);
   }
   return result;
 });
