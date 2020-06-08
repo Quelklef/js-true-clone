@@ -99,12 +99,12 @@ Another fix is to use prototyping instead of monkeypatching.
 
 Comparison of running a test suite defined in `tests.js` on different packages. See `compare.sh`.
 
-| package \ feature             | primitives | native types | prototypes | monkeypatching | relations | rich properites |
-| ----------------------------- | ---------- | ------------ | ---------- | -------------- | --------- | --------------- |
-| `true-clone` 0.7.3            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]      | ![s]            |
-| [`clone`][1] 2.1.2            | ![s]       | ![p] (1)     | ![s]       | ![p] (1)       | ![s]      | ![u]            |
-| [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] (2)     | ![s]       | ![p] (3)       | ![p] (4)  | ![u]            |
-| [`rfdc`][3] 1.1.4             | ![s]       | ![p] (5)     | ![u]       | ![u]           | ![p] (6)  | ![u]            |
+| package \ feature             | primitives | native types | prototypes | monkeypatching | relations   | rich properites |
+| ----------------------------- | ---------- | ------------ | ---------- | -------------- | ----------- | --------------- |
+| `true-clone` 0.7.3            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
+| [`clone`][1] 2.1.2            | ![s]       | ![p] <sup>1  | ![s]       | ![p] <sup>1    | ![s]        | ![u]            |
+| [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] <sup>2  | ![s]       | ![p] <sup>3    | ![p] <sup>4 | ![u]            |
+| [`rfdc`][3] 1.1.4             | ![s]       | ![p] <sup>5  | ![u]       | ![u]           | ![p] <sup>6 | ![u]            |
 
 [s]: https://via.placeholder.com/15/0d0?text=+
 [u]: https://via.placeholder.com/15/d00?text=+
@@ -133,12 +133,12 @@ Comparison of running a test suite defined in `tests.js` on different packages. 
 <details>
 <summary>Details</summary>
 
-- (1): fails for `Number`, `String`, `ArrayBuffer`, `DataView`, errors types, and typed arrays.
-- (2): fails for sparse arrays, `BigInt64Array`, `BigUint64Array`, and error types
-- (3): fails for `Array`, `BigInt64Array`, `BigUint64Array`, and error types
-- (4): fails for cyclic `Map` and `Set` objects
-- (5): fails for `Number`, `String`, `Boolean`, `RegExp`, `Map`, `Set`, `ArrayBuffer`, `DataView`, typed arrays, and error types.
-- (6): fails for diamond shapes and cyclic non-`Object` values
+- <sup>`1`</sup>: fails for `Number`, `String`, `ArrayBuffer`, `DataView`, errors types, and typed arrays.
+- <sup>`2`</sup>: fails for sparse arrays, `BigInt64Array`, `BigUint64Array`, and error types
+- <sup>`3`</sup>: fails for `Array`, `BigInt64Array`, `BigUint64Array`, and error types
+- <sup>`4`</sup>: fails for cyclic `Map` and `Set` objects
+- <sup>`5`</sup>: fails for `Number`, `String`, `Boolean`, `RegExp`, `Map`, `Set`, `ArrayBuffer`, `DataView`, typed arrays, and error types.
+- <sup>`6`</sup>: fails for diamond shapes and cyclic non-`Object` values
 </details>
 
 ## Benchmarks
