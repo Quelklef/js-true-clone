@@ -483,6 +483,11 @@ if (!process.env.PACKAGE || process.env.PACKAGE === 'true-clone') {
   const clone = require('lodash.clonedeep');
   shared_tests(clone);
 
+} else if (process.env.PACKAGE === 'rfdc') {
+
+  const clone = require('rfdc')({ proto: false, circles: true });
+  shared_tests(clone);
+
 } else {
 
   console.log("please call with one of PACKGE='', PACKAGE=true-clone, PACKAGE=clone, or PACKAGE=lodash.clonedeep");

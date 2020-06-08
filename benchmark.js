@@ -5,7 +5,8 @@ const _clone = require('clone');
 const algos = {
   true_clone: require('./clone.js').clone,
   clone: value => _clone(value, true, undefined, undefined, true),
-  lodash_clonedeep: require('lodash.clonedeep')
+  lodash_clonedeep: require('lodash.clonedeep'),
+  rfdc: require('rfdc')({ proto: false, circles: true }),
 };
 
 const Benchmark = require('benchmark');
@@ -58,6 +59,11 @@ suite
   .add('[lodash.clonedeep] boxed primitives', () => boxed_primitives.forEach(algos.lodash_clonedeep))
   .add('[lodash.clonedeep] plain object', () => algos.lodash_clonedeep(plain_object))
   .add('[lodash.clonedeep] rich object', () => algos.lodash_clonedeep(rich_object))
+
+  .add('[rfdc] primitives', () => primitives.forEach(algos.rfdc))
+  .add('[rfdc] boxed primitives', () => boxed_primitives.forEach(algos.rfdc))
+  .add('[rfdc] plain object', () => algos.rfdc(plain_object))
+  .add('[rfdc] rich object', () => algos.rfdc(rich_object))
 
   .on('cycle', event => {
     console.log('' + event.target);

@@ -7,6 +7,7 @@ Comparison of running a test suite defined in `tests.js` on different packages. 
 | `true-clone` 0.5.6            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]      | ![s]            |
 | [`clone`][1] 2.1.2            | ![s]       | ![p] (1)     | ![s]       | ![p] (1)       | ![s]      | ![u]            |
 | [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] (2)     | ![s]       | ![p] (3)       | ![p] (4)  | ![u]            |
+| [`rfdc`][3] 1.1.4             | ![s]       | ![p] (5)     | ![u]       | ![u]           | ![p] (6)  | ![u]            |
 
 ![s]: all tests passing; ![u]: no tests passing; ![p]: some tests passing
 
@@ -16,11 +17,14 @@ Comparison of running a test suite defined in `tests.js` on different packages. 
 
 [1]: https://github.com/pvorb/clone
 [2]: https://www.npmjs.com/package/lodash.clonedeep
+[3]: https://github.com/davidmarkclements/rfdc#readme
 
 - (1): fails for `Number`, `String`, `ArrayBuffer`, `DataView`, errors types, and typed arrays.
 - (2): fails for sparse arrays, `BigInt64Array`, `BigUint64Array`, and error types
 - (3): fails for `Array`, `BigInt64Array`, `BigUint64Array`, and error types
 - (4): fails for cyclic `Map` and `Set` objects
+- (5): fails for `Number`, `String`, `Boolean`, `RegExp`, `Map`, `Set`, `ArrayBuffer`, `DataView`, typed arrays, and error types.
+- (6): fails for diamond shapes and cyclic non-`Object` values
 
 Definitions
 - **primitives**: supports primitive values
@@ -35,10 +39,17 @@ Definitions
 
 ## Benchmarks
 
-See `benchmark.js`
+`true-clone` pays for its correctness with speed
 
-| package \ scope (in 1k ops/s) | primitives | plain objects | rich objects |
+See `benchmark.js`.
+Run on my personal machine.
+Values should be considered only in relation to each other.
+
+Values are in 1k ops/s.
+
+| package \ scope               | primitives | plain objects | rich objects |
 | ----------------------------- | ---------- | ------------- | ------------ |
 | `true-clone` 0.5.6            | 1503       | 117           | 170          |
 | [`clone`][1] 2.1.2            | 2053       | 236           | 294          |
 | [`lodash.clonedeep`][2] 4.5.0 | 6419       | 458           | 1021         |
+| [`rfdc`][3] 1.1.4             | 34925      | 1676          | 2546         |
