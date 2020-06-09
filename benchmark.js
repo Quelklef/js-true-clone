@@ -29,9 +29,12 @@ const primitives = [
   Symbol(),
 ];
 
-const boxed_primitives = [
-  new Number(3.14),
-  new String('string'),
+const native_object_types = [
+  [1, [2], [[3], 4]],
+  new Map([['from', 'to'], ['src', () => 'dest']]),
+  new Set([true, 'i', Symbol(), 'am', 16n, 'contained', undefined]),
+  //new Number(3.14),  // package 'clone' fails
+  //new String('string'),  // package 'clone' fails
   new Boolean(true),
 ];
 
@@ -63,25 +66,27 @@ const rich_object = new FancyList([1, 2, 3, 4], ' & ');
 
 suite
   .add('[true-clone] primitives', () => primitives.forEach(algos.true_clone))
-  .add('[true-clone] boxed primitives', () => boxed_primitives.forEach(algos.true_clone))
+  .add('[true-clone] native object types', () => native_object_types.forEach(algos.true_clone))
   .add('[true-clone] plain object', () => algos.true_clone(plain_object))
   .add('[true-clone] rich object', () => algos.true_clone(rich_object))
 
   .add('[clone] primitives', () => primitives.forEach(algos.clone))
-  .add('[clone] boxed primitives', () => boxed_primitives.forEach(algos.clone))
+  .add('[clone] native object types', () => native_object_types.forEach(algos.clone))
   .add('[clone] plain object', () => algos.clone(plain_object))
   .add('[clone] rich object', () => algos.clone(rich_object))
 
   .add('[lodash.clonedeep] primitives', () => primitives.forEach(algos.lodash_clonedeep))
-  .add('[lodash.clonedeep] boxed primitives', () => boxed_primitives.forEach(algos.lodash_clonedeep))
+  .add('[lodash.clonedeep] native object types', () => native_object_types.forEach(algos.lodash_clonedeep))
   .add('[lodash.clonedeep] plain object', () => algos.lodash_clonedeep(plain_object))
   .add('[lodash.clonedeep] rich object', () => algos.lodash_clonedeep(rich_object))
 
   .add('[rfdc] primitives', () => primitives.forEach(algos.rfdc))
-  .add('[rfdc] boxed primitives', () => boxed_primitives.forEach(algos.rfdc))
+  .add('[rfdc] native object types', () => native_object_types.forEach(algos.rfdc))
   .add('[rfdc] plain object', () => algos.rfdc(plain_object))
   .add('[rfdc] rich object', () => algos.rfdc(rich_object))
+  ;
 
+suite
   .on('cycle', event => {
     console.log('' + event.target);
   })
