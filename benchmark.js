@@ -1,18 +1,6 @@
 
-
-const _clone = require('clone');
-
-const algos = {
-  true_clone: require('./clone.js').clone,
-  clone: value => _clone(value, true, undefined, undefined, true),
-  lodash_clonedeep: require('lodash.clonedeep'),
-  rfdc: require('rfdc')({ proto: false, circles: true }),
-};
-
 const Benchmark = require('benchmark');
 const suite = new Benchmark.Suite();
-
-// --
 
 const primitives = [
   null,
@@ -64,27 +52,20 @@ class FancyList {
 
 const rich_object = new FancyList([1, 2, 3, 4], ' & ');
 
-suite
-  .add('[true-clone] primitives', () => primitives.forEach(algos.true_clone))
-  .add('[true-clone] native object types', () => native_object_types.forEach(algos.true_clone))
-  .add('[true-clone] plain object', () => algos.true_clone(plain_object))
-  .add('[true-clone] rich object', () => algos.true_clone(rich_object))
+function registerPackage(package_name, clone_func) {
+  suite
+    .add(`[${package_name}] primitives         `, () => primitives.forEach(clone_func))
+    .add(`[${package_name}] native object types`, () => native_object_types.forEach(clone_func))
+    .add(`[${package_name}] plain object       `, () => clone_func(plain_object))
+    .add(`[${package_name}] rich object        `, () => clone_func(rich_object))
+    ;
+}
 
-  .add('[clone] primitives', () => primitives.forEach(algos.clone))
-  .add('[clone] native object types', () => native_object_types.forEach(algos.clone))
-  .add('[clone] plain object', () => algos.clone(plain_object))
-  .add('[clone] rich object', () => algos.clone(rich_object))
-
-  .add('[lodash.clonedeep] primitives', () => primitives.forEach(algos.lodash_clonedeep))
-  .add('[lodash.clonedeep] native object types', () => native_object_types.forEach(algos.lodash_clonedeep))
-  .add('[lodash.clonedeep] plain object', () => algos.lodash_clonedeep(plain_object))
-  .add('[lodash.clonedeep] rich object', () => algos.lodash_clonedeep(rich_object))
-
-  .add('[rfdc] primitives', () => primitives.forEach(algos.rfdc))
-  .add('[rfdc] native object types', () => native_object_types.forEach(algos.rfdc))
-  .add('[rfdc] plain object', () => algos.rfdc(plain_object))
-  .add('[rfdc] rich object', () => algos.rfdc(rich_object))
-  ;
+const _clone = require('clone');
+registerPackage('true-clone', require('./clone.js').clone);
+registerPackage('clone', value => _clone(value, true, undefined, undefined, true));
+registerPackage('lodash.clonedeep', require('lodash.clonedeep'));
+registerPackage('rfdc', require('rfdc')({ proto: false, circles: true }));
 
 suite
   .on('cycle', event => {
