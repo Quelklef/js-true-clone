@@ -4,7 +4,7 @@
   "description": "A deep cloning algorithm aware of prototypes, getters/setters, etc.",
   "main": "clone.js",
   "scripts": {
-    "test": "sh ./test.sh",
+    "test": "npx mocha tests.js",
     "compare": "./compare.sh && \"$EDITOR\" comparison_results.txt"
   },
   "repository": {
