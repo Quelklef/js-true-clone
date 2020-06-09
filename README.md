@@ -101,7 +101,7 @@ Comparison of running a test suite defined in `tests.js` on different packages. 
 
 | package \ feature             | primitives | native types | prototypes | monkeypatching | relations   | rich properites |
 | ----------------------------- | ---------- | ------------ | ---------- | -------------- | ----------- | --------------- |
-| `true-clone` 0.7.3            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
+| `true-clone` 0.7.6            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
 | [`clone`][1] 2.1.2            | ![s]       | ![p] <sup>1  | ![s]       | ![p] <sup>1    | ![s]        | ![u]            |
 | [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] <sup>2  | ![s]       | ![p] <sup>3    | ![p] <sup>4 | ![u]            |
 | [`rfdc`][3] 1.1.4             | ![s]       | ![p] <sup>5  | ![u]       | ![u]           | ![p] <sup>6 | ![u]            |
@@ -147,12 +147,12 @@ Comparison of running a test suite defined in `tests.js` on different packages. 
 Benchmark is run on my personal machine; they should be considered only in relation to each other.
 See `benchmark.js`.
 
-| package \ scope               | primitives     | plain objects | rich objects |
-| ----------------------------- | -------------- | ------------- | ------------ |
-| `true-clone` 0.7.3            | 1503 [k ops/s] | 117           | 170          |
-| [`clone`][1] 2.1.2            | 2053           | 236           | 294          |
-| [`lodash.clonedeep`][2] 4.5.0 | 6419           | 458           | 1021         |
-| [`rfdc`][3] 1.1.4             | 34925          | 1676          | 2546         |
+| package \ scope               | primitives     | native object types | plain objects | rich objects |
+| ----------------------------- | -------------- | ------------------- | ------------- | ------------ |
+| `true-clone` 0.7.6            | 1,357k [ops/s] | 80k                 | 121k          | 181k         |
+| [`clone`][1] 2.1.2            | 1.970m         | 100k                | 234k          | 294k         |
+| [`lodash.clonedeep`][2] 4.5.0 | 5.803m         | 266k                | 273k          | 1.040m       |
+| [`rfdc`][3] 1.1.4             | 31.350m        | 1.067m              | 1.919m        | 2.567m       |
 
 ## Custom cloning
 
