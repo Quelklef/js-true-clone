@@ -14,9 +14,26 @@ const suite = new Benchmark.Suite();
 
 // --
 
-const primitives = [null, undefined, true, false, 0, 1, -1, 12n, 3.14, Number.NaN, 'string', Symbol()];
+const primitives = [
+  null,
+  undefined,
+  true,
+  false,
+  0,
+  1,
+  -1,
+  12n,
+  3.14,
+  Number.NaN,
+  'string',
+  Symbol(),
+];
 
-const boxed_primitives = [new Number(3.14), new String('string'), new Boolean(true)];
+const boxed_primitives = [
+  new Number(3.14),
+  new String('string'),
+  new Boolean(true),
+];
 
 const plain_object = {
   i_am: 'plain',
