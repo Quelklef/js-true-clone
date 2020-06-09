@@ -148,7 +148,7 @@ function shared_tests(clone) {
         assert.ok(cloned[2] === 'after');
       });
 
-      it('diamond-shaped', () => {
+      it('diamond', () => {
         const child = ['im', 'child'];
         const parent = ['before', child, 'between', child, 'after'];
         const cloned = clone(parent);
@@ -192,7 +192,7 @@ function shared_tests(clone) {
         assert.ok(cloned.get('self') === cloned);
       });
 
-      it('diamond-shaped', () => {
+      it('diamond', () => {
         const child = new Map([['i am', 'child']]);
         const diamond = new Map([['a', child], ['b', child]]);
         const cloned = clone(diamond);
@@ -361,7 +361,7 @@ function shared_tests(clone) {
       assert.ok(cloned.self === cloned);
     });
 
-    it('diamond-shaped', () => {
+    it('diamond', () => {
       const child = { i_am: 'child' };
       const parent = { left: child, right: child };
       const cloned = clone(parent);
