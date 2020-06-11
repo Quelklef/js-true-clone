@@ -97,7 +97,7 @@ Another fix is to use prototyping instead of monkeypatching.
 
 ## Comparison
 
-Comparison of running a test suite defined in `tests.js` on different packages. See `compare.sh`.
+Suite in `tests.js` run on different packages using node v14.2.0. See `compare.sh`.
 
 | package \ feature             | primitives | native types | prototypes | monkeypatching | relations   | rich properites |
 | ----------------------------- | ---------- | ------------ | ---------- | -------------- | ----------- | --------------- |
