@@ -52,14 +52,20 @@ function shared_tests(clone) {
   });
 
   function testMonkeypatching(object) {
-    it('monkeypatched', () => {
-      const prop_name = Symbol('monkeypatched');
-      object[prop_name] = 'prop val';
+    
+    const prop_name = Symbol('monkeypatched');
+    object[prop_name] = 'prop val';
+   
+    it('monkeypatched attributes are preserved', () => {
       const cloned = clone(object);
-      assert.ok(alike(cloned, object));
       assert.ok(cloned[prop_name] === object[prop_name]);
       cloned[prop_name] = 'different';
       assert.ok(cloned[prop_name] !== object[prop_name]);
+    });
+    
+    it("monkeypatched attributes don't break correctness", () => {
+      const cloned = clone(object);
+      assert.ok(alike(cloned, object));
     });
   }
 
