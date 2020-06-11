@@ -101,7 +101,7 @@ Suite in `tests.js` run on different packages using node v14.2.0. See `compare.s
 
 | package \ feature             | primitives | native types | prototypes | monkeypatching | relations   | rich properites |
 | ----------------------------- | ---------- | ------------ | ---------- | -------------- | ----------- | --------------- |
-| `true-clone` 0.7.6            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
+| `true-clone` 0.7.7            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
 | [`clone`][1] 2.1.2            | ![s]       | ![p] <sup>1  | ![s]       | ![p] <sup>1    | ![s]        | ![u]            |
 | [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] <sup>2  | ![s]       | ![p] <sup>3    | ![p] <sup>4 | ![u]            |
 | [`rfdc`][3] 1.1.4             | ![s]       | ![p] <sup>5  | ![u]       | ![u]           | ![p] <sup>6 | ![u]            |
@@ -149,10 +149,10 @@ See `benchmark.js`.
 
 | package \ scope               | primitives     | native object types | plain objects | rich objects |
 | ----------------------------- | -------------- | ------------------- | ------------- | ------------ |
-| `true-clone` 0.7.6            | 1.357m [ops/s] | 80k                 | 121k          | 181k         |
-| [`clone`][1] 2.1.2            | 1.970m         | 100k                | 234k          | 294k         |
-| [`lodash.clonedeep`][2] 4.5.0 | 5.803m         | 266k                | 273k          | 1.040m       |
-| [`rfdc`][3] 1.1.4             | 31.350m        | 1.067m              | 1.919m        | 2.567m       |
+| `true-clone` 0.7.7            | 1.622m [ops/s] | 121k                | 184k          | 255k         |
+| [`clone`][1] 2.1.2            | 1.596m         | 99k                 | 229k          | 288k         |
+| [`lodash.clonedeep`][2] 4.5.0 | 5.864m         | 130k                | 293k          | 948k         |
+| [`rfdc`][3] 1.1.4             | 33.521m        | 1.054m              | 1.957m        | 2.636m       |
 
 ## Custom cloning
 

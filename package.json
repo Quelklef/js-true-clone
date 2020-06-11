@@ -1,6 +1,6 @@
 {
   "name": "true-clone",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "A deep cloning algorithm aware of prototypes, getters/setters, etc.",
   "main": "clone.js",
   "scripts": {
