@@ -149,7 +149,7 @@ See `benchmark.js`.
 
 | package \ scope               | primitives     | native object types | plain objects | rich objects |
 | ----------------------------- | -------------- | ------------------- | ------------- | ------------ |
-| `true-clone` 0.7.6            | 1,357k [ops/s] | 80k                 | 121k          | 181k         |
+| `true-clone` 0.7.6            | 1.357m [ops/s] | 80k                 | 121k          | 181k         |
 | [`clone`][1] 2.1.2            | 1.970m         | 100k                | 234k          | 294k         |
 | [`lodash.clonedeep`][2] 4.5.0 | 5.803m         | 266k                | 273k          | 1.040m       |
 | [`rfdc`][3] 1.1.4             | 31.350m        | 1.067m              | 1.919m        | 2.567m       |
