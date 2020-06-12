@@ -101,7 +101,7 @@ Suite in `tests.js` run on different packages using node v14.2.0. See `compare.s
 
 | package \ feature             | primitives | native types | prototypes | monkeypatching | relations   | rich properites |
 | ----------------------------- | ---------- | ------------ | ---------- | -------------- | ----------- | --------------- |
-| `true-clone` 0.7.8            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
+| `true-clone` 0.7.9            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
 | [`clone`][1] 2.1.2            | ![s]       | ![p] <sup>1  | ![s]       | ![p] <sup>1    | ![s]        | ![u]            |
 | [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] <sup>2  | ![s]       | ![p] <sup>3    | ![p] <sup>4 | ![u]            |
 | [`rfdc`][3] 1.1.4             | ![s]       | ![p] <sup>5  | ![u]       | ![u]           | ![p] <sup>6 | ![u]            |
@@ -149,10 +149,10 @@ See `benchmark.js`.
 
 | package \ scope               | primitives     | native object types | plain objects | arrays |
 | ----------------------------- | -------------- | ------------------- | ------------- | ------ |
-| `true-clone` 0.7.8            | 1.582m [ops/s] | 328k                | 434k          | 1.159m |
-| [`clone`][1] 2.1.2            | 1.926m         | 95k                 | 264k          | 262k   |
-| [`lodash.clonedeep`][2] 4.5.0 | 6.104m         | 222k                | 791k          | 2.094m |
-| [`rfdc`][3] 1.1.4             | 33.594m        | 1.041m              | 2.463m        | 2.385m |
+| `true-clone` 0.7.9            | 2.305m [ops/s] | 337k                | 465k          | 1.281m |
+| [`clone`][1] 2.1.2            | 1.943m         | 90k                 | 266k          | 257k   |
+| [`lodash.clonedeep`][2] 4.5.0 | 6.132m         | 227k                | 810k          | 2.086m |
+| [`rfdc`][3] 1.1.4             | 33.599m        | 969k                | 2.480m        | 2.392m |
 
 <details>
 <summary>Details</summary>
