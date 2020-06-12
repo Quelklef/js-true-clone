@@ -35,13 +35,23 @@ The *official* API for this package is to provide a cloning algorithm with perfe
 All imperfect behaviour, even if documented, is *not* a part of the API and should *not* be relied on.
 Updates to this package will thus almost always be either minor- or patch-level updates.
 
+## Behaviour details
+
+Most things work as expected.
+Some notes:
+
+- prototypes: are referenced rather than copied; `clone(Object.create(some_proto)).prototype === some_proto`
+- `Proxy` objects: do not return other proxies. Additonally, all traps are ignored besides the following:
+  - `getPrototypeOf`: given prototype is assigned to new object
+  - `ownKeys`: these are the keys that will appear on the clone
+  - `getOwnPropertyDescriptor`: is used to define properties on the clone
+  - `get`: will only be called with the `customClone` symbol, for custom cloners
+
 ## Caveats
 
 Where *caveat* means incorrect behaviour due to JS limitations.
 
 - **`Function`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
-
-- **`Proxy`**: Proxies will not be detected and will not be preserved while cloning.
 
 ## Gotchas
 

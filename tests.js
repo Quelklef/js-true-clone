@@ -23,6 +23,8 @@ function shared_tests(clone) {
       assert.ok(clone(1) === 1);
       assert.ok(clone(-1) === -1);
       assert.ok(clone(3.75) === 3.75);
+      assert.ok(Object.is(+0, clone(+0)));
+      assert.ok(Object.is(-0, clone(-0)));
       assert.ok(clone(Number.INFINITY) === Number.INFINITY);
       assert.ok(clone(Number.NEGATIVE_INFINITY) === Number.NEGATIVE_INFINITY);
       assert.ok(Number.isNaN(clone(Number.NaN)));
@@ -467,6 +469,118 @@ function true_clone_tests(package) {
       const instance = new Class();
       assert.ok(clone(instance) === 10);
     });
+  });
+  
+  describe('with Proxy objects', () => {
+
+    /*
+
+    Proxy trap list, as of [2020-06-12]
+    handler
+      .apply()                    [function call]
+      .construct()                [new operator]
+      .defineProperty()           [Object.defineProperty]
+      .deleteProperty()           [delete operator]
+      .get()                      [getting property values]
+      .getOwnPropertyDescriptor() [Object.getOwnPropertyDescriptor]
+      .getPrototypeOf()           [Object.getPrototypeOf]
+      .has()                      [the in operator]
+      .isExtensible()             [Object.isExtensible]
+      .ownKeys()                  [Object.getOwnPropertyNames/Symbols]
+      .preventExtensions()        [Object.preventExtensions]
+      .set()                      [setting property values]
+      .setPrototypeOf()           [Object.setPrototypeOf]
+
+    */
+    
+    class Pair {
+      constructor(left, right) {
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    const pair = new Pair('leftval', 'rightval');
+    pair.middle = 'middle';
+
+    it('ignores apply, construct, defineProperty, deleteProperty, has, isExtensible, preventExtensions, set, setPrototypeOf', () => {
+
+      const do_err = (trap_name) => () => { throw Error(`should not call trap ${trap_name}`); };
+      const proxy = new Proxy(pair, {
+        apply: do_err('apply'),
+        construct: do_err('construct'),
+        defineProperty: do_err('defineProperty'),
+        deleteProperty: do_err('deleteProperty'),
+        has: do_err('has'),
+        isExtensible: do_err('isExtensible'),
+        preventExtensions: do_err('preventExtensions'),
+        set: do_err('set'),
+        setPrototypeOf: do_err('setPrototypeOf'),
+      });
+
+      clone(proxy);
+      
+    });
+    
+    it('interacts with ownKeys', () => {
+
+      const noright = clone(pair);
+      delete noright.right;
+
+      const proxy = new Proxy(pair, {
+        ownKeys() {
+          return ['left', 'middle'];
+        }
+      });
+
+      assert(equals(noright, clone(proxy)));
+      
+    });
+    
+    it('interacts with getOwnPropertyDescriptor', () => {
+
+      const proxy = new Proxy(pair, {
+        getOwnPropertyDescriptor(target, prop) {
+          if (prop === 'right')
+            return { ...Object.getOwnPropertyDescriptor(target, prop), enumerable: false };
+          return Object.getOwnPropertyDescriptor(target, prop);
+        }
+      });
+
+      const cloned = clone(proxy);
+      assert(equals(Object.keys(cloned), ['left', 'middle']));
+      assert(equals(cloned.right, 'rightval'));
+      
+    });
+    
+    it('interacts with get(custom_clone)', () => {
+
+      // note there's no need for .has(custom_clone)
+
+      const proxy = new Proxy(pair, {
+        get(target, prop) {
+          if (prop !== custom_clone)
+            throw Error('proxy get trap should only work with customClone');
+          return () => 'cloned';
+        }
+      });
+
+      assert(equals(clone(proxy), 'cloned'));
+      
+    });
+    
+    it('interacts with getPrototypeOf', () => {
+
+      const proxy = new Proxy(pair, {
+        getPrototypeOf() {
+          return Object.prototype;
+        }
+      });
+
+      assert(equals(clone(proxy), { ...pair }));
+      
+    });
+    
   });
 
 };
