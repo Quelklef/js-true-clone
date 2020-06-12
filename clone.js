@@ -68,10 +68,42 @@ function outer_clone(source) {
       // This may be overkill, but it will probably most needed cases
       
       case Array.prototype: {
-        const result = new Array(source.length);
+
+        const result = [];
         cache.set(source, result);
+
+        const keys = Reflect.ownKeys(source);
+
+        // We'll assume the array is well-behaved (dense and not monkeypatched)
+        // If that turns out to be false, we'll fallback to generic code
+
+        well_behaved: {
+
+          let i;
+          for (i = 0; i < source.length; i++) {
+            if (i in source) {
+              result.push(clone(source[i]));
+            } else {
+              // Array is sparse
+              break well_behaved;
+            }
+          }
+
+
+          if (i !== keys.length - 1) {
+            // Array is monkeypatched
+            break well_behaved;
+          }
+
+          return result;
+
+        }
+
+        // Generic fallback
+        result.length = 0;
         mirror(source, result, clone);
         return result;
+
       }
 
       case Boolean.prototype: {
