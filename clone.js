@@ -36,7 +36,7 @@ function outer_clone(source) {
 function clone(source, cache) {
 
   // Return primitive and Function values directly
-  if (source === null || typeof source !== 'object') {
+  if (typeof source !== 'object' || source === null) {
     return source;
   }
 
