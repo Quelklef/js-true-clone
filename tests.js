@@ -403,6 +403,13 @@ function shared_tests(clone) {
       object.items = [1, 2, 3];
       assert.ok(alike(object, clone(object)));
     });
+    
+    it('with prototype from Object.create(null)', () => {
+      const object = Object.create(null);
+      object.items = [1, 2, 3];
+      assert.ok(Object.getPrototypeOf(object) === null);
+      assert.ok(alike(object, clone(object)));
+    });
 
     it('ES6 class instances with no hierarchy', () => {
       class Pair {

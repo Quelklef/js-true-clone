@@ -149,6 +149,13 @@ function clone(source, cache) {
       return result;
     }
 
+    case null: {
+      const result = Object.create(null);
+      cache.set(source, result);
+      mirror(source, result, cache);
+      return result;
+    }
+
     case Promise_prototype: {
       const result = new Promise(source.then.bind(source));
       mirror(source, result, cache);
