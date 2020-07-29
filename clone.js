@@ -126,7 +126,7 @@ function clone(source, cache) {
       return result;
     }
 
-    case Map.prototype: {
+    case Map_prototype: {
       const result = new Map();
       cache.set(source, result);
       mirror(source, result, cache);
@@ -149,7 +149,7 @@ function clone(source, cache) {
       return result;
     }
 
-    case Promise.prototype: {
+    case Promise_prototype: {
       const result = new Promise(source.then.bind(source));
       mirror(source, result, cache);
       return result;
@@ -161,7 +161,7 @@ function clone(source, cache) {
       return result;
     }
 
-    case Set.prototype: {
+    case Set_prototype: {
       const result = new Set();
       cache.set(source, result);
       mirror(source, result, cache);
@@ -177,97 +177,97 @@ function clone(source, cache) {
       return result;
     }
 
-    case WeakMap.prototype: {
+    case WeakMap_prototype: {
       // WeakMaps cannot be cloned :(
       return source;
     }
 
-    case WeakSet.prototype: {
+    case WeakSet_prototype: {
       //WeakSets cannot be cloned :(
       return source;
     }
 
     // == TYPED ARRAYS ET AL == //
 
-    case ArrayBuffer.prototype: {
+    case ArrayBuffer_prototype: {
       const result = source.slice();
       mirror(source, result, cache);
       return result;
     }
 
-    case SharedArrayBuffer.prototype: {
+    case SharedArrayBuffer_prototype: {
       const result = source.slice();
       mirror(source, result, cache);
       return result;
     }
 
-    case DataView.prototype: {
+    case DataView_prototype: {
       const result = new DataView(clone(source.buffer, cache), source.byteOffset, source.byteLength);
       mirror(source, result, cache);
       return result;
     }
 
-    case BigInt64Array.prototype: {
+    case BigInt64Array_prototype: {
       const result = new BigInt64Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case BigUint64Array.prototype: {
+    case BigUint64Array_prototype: {
       const result = new BigUint64Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Float32Array.prototype: {
+    case Float32Array_prototype: {
       const result = new Float32Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Float64Array.prototype: {
+    case Float64Array_prototype: {
       const result = new Float64Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Int8Array.prototype: {
+    case Int8Array_prototype: {
       const result = new Int8Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Int16Array.prototype: {
+    case Int16Array_prototype: {
       const result = new Int16Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Int32Array.prototype: {
+    case Int32Array_prototype: {
       const result = new Int32Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Uint8Array.prototype: {
+    case Uint8Array_prototype: {
       const result = new Uint8Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Uint8ClampedArray.prototype: {
+    case Uint8ClampedArray_prototype: {
       const result = new Uint8ClampedArray(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Uint16Array.prototype: {
+    case Uint16Array_prototype: {
       const result = new Uint16Array(source);
       mirror(source, result, cache);
       return result;
     }
 
-    case Uint32Array.prototype: {
+    case Uint32Array_prototype: {
       const result = new Uint32Array(source);
       mirror(source, result, cache);
       return result;
@@ -321,3 +321,24 @@ function clone(source, cache) {
   
 }
 
+const Promise_prototype           = typeof Promise           !== 'undefined' ? Promise.prototype           : undefined;
+
+const Map_prototype               = typeof Map               !== 'undefined' ? Map.prototype               : undefined;
+const Set_prototype               = typeof Set               !== 'undefined' ? Set.prototype               : undefined;
+const WeakMap_prototype           = typeof WeakMap           !== 'undefined' ? WeakMap.prototype           : undefined;
+const WeakSet_prototype           = typeof WeakSet           !== 'undefined' ? WeakSet.prototype           : undefined;
+
+const ArrayBuffer_prototype       = typeof ArrayBuffer       !== 'undefined' ? ArrayBuffer.prototype       : undefined;
+const SharedArrayBuffer_prototype = typeof SharedArrayBuffer !== 'undefined' ? SharedArrayBuffer.prototype : undefined;
+const DataView_prototype          = typeof DataView          !== 'undefined' ? DataView.prototype          : undefined;
+const BigInt64Array_prototype     = typeof BigInt64Array     !== 'undefined' ? BigInt64Array.prototype     : undefined;
+const BigUint64Array_prototype    = typeof BigUint64Array    !== 'undefined' ? BigUint64Array.prototype    : undefined;
+const Float32Array_prototype      = typeof Float32Array      !== 'undefined' ? Float32Array.prototype      : undefined;
+const Float64Array_prototype      = typeof Float64Array      !== 'undefined' ? Float64Array.prototype      : undefined;
+const Int8Array_prototype         = typeof Int8Array         !== 'undefined' ? Int8Array.prototype         : undefined;
+const Int16Array_prototype        = typeof Int16Array        !== 'undefined' ? Int16Array.prototype        : undefined;
+const Int32Array_prototype        = typeof Int32Array        !== 'undefined' ? Int32Array.prototype        : undefined;
+const Uint8Array_prototype        = typeof Uint8Array        !== 'undefined' ? Uint8Array.prototype        : undefined;
+const Uint8ClampedArray_prototype = typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray.prototype : undefined;
+const Uint16Array_prototype       = typeof Uint16Array       !== 'undefined' ? Uint16Array.prototype       : undefined;
+const Uint32Array_prototype       = typeof Uint32Array       !== 'undefined' ? Uint32Array.prototype       : undefined;
