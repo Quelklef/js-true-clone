@@ -12,43 +12,43 @@ function shared_tests(clone) {
   describe('primitives', () => {
 
     it('null', () => {
-      assert.ok(clone(null) === null);
+      assert(clone(null) === null);
     });
 
     it('undefined', () => {
-      assert.ok(clone(undefined) === undefined);
+      assert(clone(undefined) === undefined);
     });
 
     it('number', () => {
-      assert.ok(clone(1) === 1);
-      assert.ok(clone(-1) === -1);
-      assert.ok(clone(3.75) === 3.75);
-      assert.ok(Object.is(+0, clone(+0)));
-      assert.ok(Object.is(-0, clone(-0)));
-      assert.ok(clone(Number.INFINITY) === Number.INFINITY);
-      assert.ok(clone(Number.NEGATIVE_INFINITY) === Number.NEGATIVE_INFINITY);
-      assert.ok(Number.isNaN(clone(Number.NaN)));
+      assert(clone(1) === 1);
+      assert(clone(-1) === -1);
+      assert(clone(3.75) === 3.75);
+      assert(Object.is(+0, clone(+0)));
+      assert(Object.is(-0, clone(-0)));
+      assert(clone(Number.INFINITY) === Number.INFINITY);
+      assert(clone(Number.NEGATIVE_INFINITY) === Number.NEGATIVE_INFINITY);
+      assert(Number.isNaN(clone(Number.NaN)));
     });
 
     it('string', () => {
-      assert.ok(clone('') === '');
-      assert.ok(clone('string') === 'string');
+      assert(clone('') === '');
+      assert(clone('string') === 'string');
     });
 
     it('boolean', () => {
-      assert.ok(clone(false) === false);
-      assert.ok(clone(true) === true);
+      assert(clone(false) === false);
+      assert(clone(true) === true);
     });
 
     it('symbol', () => {
       const symbol = Symbol();
-      assert.ok(clone(symbol) === symbol);
+      assert(clone(symbol) === symbol);
     });
 
     it('bigint', () => {
-      assert.ok(clone(0n) === 0n);
-      assert.ok(clone(100n) === 100n);
-      assert.ok(clone(-100n) === -100n);
+      assert(clone(0n) === 0n);
+      assert(clone(100n) === 100n);
+      assert(clone(-100n) === -100n);
     });
 
   });
@@ -60,14 +60,14 @@ function shared_tests(clone) {
    
     it('monkeypatched attributes are preserved', () => {
       const cloned = clone(object);
-      assert.ok(cloned[prop_name] === object[prop_name]);
+      assert(cloned[prop_name] === object[prop_name]);
       cloned[prop_name] = 'different';
-      assert.ok(cloned[prop_name] !== object[prop_name]);
+      assert(cloned[prop_name] !== object[prop_name]);
     });
     
     it("monkeypatched attributes don't break correctness", () => {
       const cloned = clone(object);
-      assert.ok(alike(cloned, object));
+      assert(alike(cloned, object));
     });
   }
 
@@ -76,7 +76,7 @@ function shared_tests(clone) {
     describe('Number', () => {
       it('simple', () => {
         const number = new Number(3.14);
-        assert.ok(alike(number, clone(number)));
+        assert(alike(number, clone(number)));
       });
 
       testMonkeypatching(new Number(3.14));
@@ -85,7 +85,7 @@ function shared_tests(clone) {
     describe('String', () => {
       it('simple', () => {
         const string = new String('string');
-        assert.ok(alike(string, clone(string)));
+        assert(alike(string, clone(string)));
       });
 
       testMonkeypatching(new String('imastring'));
@@ -94,7 +94,7 @@ function shared_tests(clone) {
     describe('Boolean', () => {
       it('simple', () => {
         const boolean = new Boolean(true);
-        assert.ok(alike(boolean, clone(boolean)));
+        assert(alike(boolean, clone(boolean)));
       });
 
       testMonkeypatching(new Boolean(true));
@@ -103,7 +103,7 @@ function shared_tests(clone) {
     describe('Date', () => {
       it('simple', () => {
         const now = new Date();
-        assert.ok(alike(now, clone(now)));
+        assert(alike(now, clone(now)));
       });
 
       testMonkeypatching(new Date());
@@ -120,7 +120,7 @@ function shared_tests(clone) {
     describe('RegExp', () => {
       it('simple', () => {
         const reg = /x/g;
-        assert.ok(alike(reg, clone(reg)));
+        assert(alike(reg, clone(reg)));
       });
 
       testMonkeypatching(/x/g);
@@ -134,40 +134,40 @@ function shared_tests(clone) {
 
       it('empty', () => {
         const empty = [];
-        assert.ok(alike(empty, clone(empty)));
+        assert(alike(empty, clone(empty)));
       });
 
       it('nonempty', () => {
         const nonempty = [Number.INFINITY, 0, undefined, Symbol(), 12n];
-        assert.ok(alike(nonempty, clone(nonempty)));
+        assert(alike(nonempty, clone(nonempty)));
       });
 
       it('nested', () => {
         const nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
-        assert.ok(alike(nested, clone(nested)));
+        assert(alike(nested, clone(nested)));
       });
 
       it('cyclic', () => {
         const cyclic = ['before', undefined, 'after'];
         cyclic[1] = cyclic;
         const cloned = clone(cyclic);
-        assert.ok(cloned[0] === 'before');
-        assert.ok(cloned[1] === cloned);
-        assert.ok(cloned[2] === 'after');
+        assert(cloned[0] === 'before');
+        assert(cloned[1] === cloned);
+        assert(cloned[2] === 'after');
       });
 
       it('diamond', () => {
         const child = ['im', 'child'];
         const parent = ['before', child, 'between', child, 'after'];
         const cloned = clone(parent);
-        assert.ok(alike(parent, cloned));
-        assert.ok(parent[1] !== cloned[1]);
-        assert.ok(cloned[1] === cloned[3]);
+        assert(alike(parent, cloned));
+        assert(parent[1] !== cloned[1]);
+        assert(cloned[1] === cloned[3]);
       });
 
       it('sparse', () => {
         const sparse = [1,,3,,5];
-        assert.ok(alike(sparse, clone(sparse)));
+        assert(alike(sparse, clone(sparse)));
       });
 
       testMonkeypatching([3, 1, 4]);
@@ -178,33 +178,33 @@ function shared_tests(clone) {
 
       it('empty', () => {
         const empty = new Map();
-        assert.ok(alike(empty, clone(empty)));
+        assert(alike(empty, clone(empty)));
       });
 
       it('nonempty', () => {
         const nonempty = new Map([['ping', 'x'], ['y', 'pong']]);
-        assert.ok(alike(nonempty, clone(nonempty)));
+        assert(alike(nonempty, clone(nonempty)));
       });
 
       it('nested', () => {
         const nested = new Map([['m', new Map([['mx', 0]])]]);
-        assert.ok(alike(nested, clone(nested)));
+        assert(alike(nested, clone(nested)));
       });
 
       it('cyclic', () => {
         const cyclic = new Map();
         cyclic.set('self', cyclic);
         const cloned = clone(cyclic);
-        assert.ok(cloned !== cyclic);
-        assert.ok(cloned.size === cyclic.size);
-        assert.ok(cloned.get('self') === cloned);
+        assert(cloned !== cyclic);
+        assert(cloned.size === cyclic.size);
+        assert(cloned.get('self') === cloned);
       });
 
       it('diamond', () => {
         const child = new Map([['i am', 'child']]);
         const diamond = new Map([['a', child], ['b', child]]);
         const cloned = clone(diamond);
-        assert.ok(alike(diamond, cloned));
+        assert(alike(diamond, cloned));
       });
 
       testMonkeypatching(new Map([['ping', 'x'], ['y', 'pong']]));
@@ -215,26 +215,26 @@ function shared_tests(clone) {
 
       it('empty', () => {
         const empty = new Set([]);
-        assert.ok(alike(empty, clone(empty)));
+        assert(alike(empty, clone(empty)));
       });
 
       it('nonempty', () => {
         const nonempty = new Set([1, 2, 3]);
-        assert.ok(alike(nonempty, clone(nonempty)));
+        assert(alike(nonempty, clone(nonempty)));
       });
 
       it('nested', () => {
         const child = new Set(['child']);
         const parent = new Set([child]);
-        assert.ok(alike(parent, clone(parent)));
+        assert(alike(parent, clone(parent)));
       });
 
       it('cyclic', () => {
         const cyclic = new Set();
         cyclic.add(cyclic);
         const cloned = clone(cyclic);
-        assert.ok(cloned !== cyclic)
-        assert.ok(cloned.has(cloned));
+        assert(cloned !== cyclic)
+        assert(cloned.has(cloned));
       });
 
       testMonkeypatching(new Set([1, 2, 3]));
@@ -256,7 +256,7 @@ function shared_tests(clone) {
     describe('ArrayBuffer', () => {
       it('simple', () => {
         const buffer = new ArrayBuffer(32);
-        assert.ok(alike(buffer, clone(buffer)));
+        assert(alike(buffer, clone(buffer)));
       });
 
       testMonkeypatching(new ArrayBuffer(16));
@@ -271,11 +271,11 @@ function shared_tests(clone) {
         const buffer = new ArrayBuffer(32);
         const view = new DataView(buffer, 1, 16);
         const cloned = clone(view);
-        assert.ok(alike(view, cloned));
-        assert.ok(view.buffer !== cloned.buffer);
+        assert(alike(view, cloned));
+        assert(view.buffer !== cloned.buffer);
         cloned.setInt16(0, 12);
-        assert.ok(view.getInt16(0) !== 12);
-        assert.ok(view.getInt16(1) !== 12);
+        assert(view.getInt16(0) !== 12);
+        assert(view.getInt16(1) !== 12);
       });
 
       testMonkeypatching(new DataView(new ArrayBuffer(16)));
@@ -285,7 +285,7 @@ function shared_tests(clone) {
       describe(constructor.name, () => {
         it('empty', () => {
           const empty = new constructor(32);
-          assert.ok(alike(empty, clone(empty)));
+          assert(alike(empty, clone(empty)));
         });
 
         it('nonempty', () => {
@@ -293,7 +293,7 @@ function shared_tests(clone) {
           nonempty[0] = sample_value;
           nonempty[15] = sample_value;
           nonempty[31] = sample_value;
-          assert.ok(alike(nonempty, clone(nonempty)));
+          assert(alike(nonempty, clone(nonempty)));
         });
 
         testMonkeypatching(
@@ -327,7 +327,7 @@ function shared_tests(clone) {
   function testError(error) {
     describe(error.constructor.prototype.name, () => {
       it('simple', () => {
-        assert.ok(alike(error, clone(error)));
+        assert(alike(error, clone(error)));
       });
 
       testMonkeypatching(error);
@@ -348,39 +348,39 @@ function shared_tests(clone) {
 
     it('empty', () => {
       const empty = {};
-      assert.ok(alike(empty, clone(empty)));
+      assert(alike(empty, clone(empty)));
     });
 
     it('nonempty', () => {
       const nonempty = { left: 'right', up: 'down', red: 'blue' };
-      assert.ok(alike(nonempty, clone(nonempty)));
+      assert(alike(nonempty, clone(nonempty)));
     });
 
     it('nested', () => {
       const nested = { child: { val: 'val!' } };
-      assert.ok(alike(nested, clone(nested)));
+      assert(alike(nested, clone(nested)));
     });
 
     it('cyclic', () => {
       const object = { };
       object.self = object;
       const cloned = clone(object);
-      assert.ok(cloned !== object);
-      assert.ok(cloned.self === cloned);
+      assert(cloned !== object);
+      assert(cloned.self === cloned);
     });
 
     it('diamond', () => {
       const child = { i_am: 'child' };
       const parent = { left: child, right: child };
       const cloned = clone(parent);
-      assert.ok(alike(cloned, parent));
-      assert.ok(cloned.left === cloned.right);
+      assert(alike(cloned, parent));
+      assert(cloned.left === cloned.right);
     });
 
     it('with non-string keys', () => {
       const key = Symbol();
       const nonempty = { [key]: 'val' };
-      assert.ok(alike(nonempty, clone(nonempty)));
+      assert(alike(nonempty, clone(nonempty)));
     });
 
     it('function prototype instances with no hierarchy', () => {
@@ -389,7 +389,7 @@ function shared_tests(clone) {
         this.right = right;
       }
       const pair = new Pair(3, 4);
-      assert.ok(alike(pair, clone(pair)));
+      assert(alike(pair, clone(pair)));
     });
 
     it('with prototype from Object.create', () => {
@@ -401,14 +401,14 @@ function shared_tests(clone) {
       };
       const object = Object.create(proto);
       object.items = [1, 2, 3];
-      assert.ok(alike(object, clone(object)));
+      assert(alike(object, clone(object)));
     });
     
     it('with prototype from Object.create(null)', () => {
       const object = Object.create(null);
       object.items = [1, 2, 3];
-      assert.ok(Object.getPrototypeOf(object) === null);
-      assert.ok(alike(object, clone(object)));
+      assert(Object.getPrototypeOf(object) === null);
+      assert(alike(object, clone(object)));
     });
 
     it('ES6 class instances with no hierarchy', () => {
@@ -419,7 +419,7 @@ function shared_tests(clone) {
         }
       }
       const pair = new Pair(3, 4);
-      assert.ok(alike(pair, clone(pair)));
+      assert(alike(pair, clone(pair)));
     });
 
     it('ES6 classes with hierarchy', () => {
@@ -435,7 +435,7 @@ function shared_tests(clone) {
         }
       }
       const child = new Child('p_val', 'c_val');
-      assert.ok(alike(child, clone(child)));
+      assert(alike(child, clone(child)));
     });
 
     it('with getters', () => {
@@ -444,9 +444,9 @@ function shared_tests(clone) {
         get() { return this.val; }
       });
       const cloned = clone(object);
-      assert.ok(alike(object, cloned));
+      assert(alike(object, cloned));
       cloned.val = 'not';
-      assert.ok(cloned.getter === 'not');
+      assert(cloned.getter === 'not');
     });
 
   });
@@ -464,7 +464,7 @@ function true_clone_tests(package) {
           return 10;
         }
       };
-      assert.ok(clone(object) === 10);
+      assert(clone(object) === 10);
     });
 
     it('on prototypes', () => {
@@ -474,7 +474,7 @@ function true_clone_tests(package) {
         }
       }
       const instance = new Class();
-      assert.ok(clone(instance) === 10);
+      assert(clone(instance) === 10);
     });
   });
   
