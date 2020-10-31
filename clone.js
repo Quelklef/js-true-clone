@@ -14,10 +14,6 @@ function mirror(source, result, cache) {
   }
 }
 
-const custom_clone = Symbol();
-module.exports.customClone = custom_clone;
-module.exports.custom_clone = custom_clone;
-
 module.exports.clone =
 function outer_clone(source) {
 
@@ -29,7 +25,7 @@ function outer_clone(source) {
   const cache = new WeakMap();
 
   return clone(source, cache);
-  
+
 }
 
 // Actual algorithm implementation
@@ -45,11 +41,6 @@ function clone(source, cache) {
     return cache.get(source);
   }
 
-  // Allow for custom cloning
-  if (source[custom_clone]) {
-    return source[custom_clone]();
-  }
-
   const prototype = Object.getPrototypeOf(source);
 
   switch (prototype) {
@@ -61,12 +52,12 @@ function clone(source, cache) {
       mirror(source, result, cache);
       return result;
     }
-    
+
     // Some types must be handled specially
     // (For instance if they have any internal slots)
     // I've taken this list from the list of well-known intrinsic objects (https://tc39.es/ecma262/#sec-well-known-intrinsic-objects)
     // This may be overkill, but it will probably most needed cases
-    
+
     case Array.prototype: {
 
       const result = [];
@@ -325,7 +316,7 @@ function clone(source, cache) {
     }
 
   }
-  
+
 }
 
 const Promise_prototype           = typeof Promise           !== 'undefined' ? Promise.prototype           : undefined;

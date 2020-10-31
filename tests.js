@@ -54,17 +54,17 @@ function shared_tests(clone) {
   });
 
   function testMonkeypatching(object) {
-    
+
     const prop_name = Symbol('monkeypatched');
     object[prop_name] = 'prop val';
-   
+
     it('monkeypatched attributes are preserved', () => {
       const cloned = clone(object);
       assert(cloned[prop_name] === object[prop_name]);
       cloned[prop_name] = 'different';
       assert(cloned[prop_name] !== object[prop_name]);
     });
-    
+
     it("monkeypatched attributes don't break correctness", () => {
       const cloned = clone(object);
       assert(alike(cloned, object));
@@ -403,7 +403,7 @@ function shared_tests(clone) {
       object.items = [1, 2, 3];
       assert(alike(object, clone(object)));
     });
-    
+
     it('with prototype from Object.create(null)', () => {
       const object = Object.create(null);
       object.items = [1, 2, 3];
@@ -455,29 +455,8 @@ function shared_tests(clone) {
 
 function true_clone_tests(package) {
 
-  const { clone, custom_clone } = package;
+  const { clone } = package;
 
-  describe('allows for custom cloners', () => {
-    it('on objects', () => {
-      const object = {
-        [custom_clone]() {
-          return 10;
-        }
-      };
-      assert(clone(object) === 10);
-    });
-
-    it('on prototypes', () => {
-      class Class {
-        [custom_clone]() {
-          return 10;
-        }
-      }
-      const instance = new Class();
-      assert(clone(instance) === 10);
-    });
-  });
-  
   describe('with Proxy objects', () => {
 
     /*
@@ -499,7 +478,7 @@ function true_clone_tests(package) {
       .setPrototypeOf()           [Object.setPrototypeOf]
 
     */
-    
+
     class Pair {
       constructor(left, right) {
         this.left = left;
@@ -526,9 +505,9 @@ function true_clone_tests(package) {
       });
 
       clone(proxy);
-      
+
     });
-    
+
     it('interacts with ownKeys', () => {
 
       const noright = clone(pair);
@@ -541,9 +520,9 @@ function true_clone_tests(package) {
       });
 
       assert(equals(noright, clone(proxy)));
-      
+
     });
-    
+
     it('interacts with getOwnPropertyDescriptor', () => {
 
       const proxy = new Proxy(pair, {
@@ -557,25 +536,9 @@ function true_clone_tests(package) {
       const cloned = clone(proxy);
       assert(equals(Object.keys(cloned), ['left', 'middle']));
       assert(equals(cloned.right, 'rightval'));
-      
+
     });
-    
-    it('interacts with get(custom_clone)', () => {
 
-      // note there's no need for .has(custom_clone)
-
-      const proxy = new Proxy(pair, {
-        get(target, prop) {
-          if (prop !== custom_clone)
-            throw Error('proxy get trap should only work with customClone');
-          return () => 'cloned';
-        }
-      });
-
-      assert(equals(clone(proxy), 'cloned'));
-      
-    });
-    
     it('interacts with getPrototypeOf', () => {
 
       const proxy = new Proxy(pair, {
@@ -585,9 +548,9 @@ function true_clone_tests(package) {
       });
 
       assert(equals(clone(proxy), { ...pair }));
-      
+
     });
-    
+
   });
 
 };
