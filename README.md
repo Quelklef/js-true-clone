@@ -13,12 +13,13 @@ then
 ```js
 const { clone } = require('true-clone');
 // later ...
-const cloned = clone(my_object);
+const cloned = clone(myObject);
 ```
 
 ## Behaviour
 
 The cloning algorithm is pretty smart and is aware of:
+
 - Native JS types! This includes primitives, `Array`, `Set`, `Map`, boxed primitives, typed arrays, etc.
 - Prototypes! Finally, you can clone custom classes!
 - Getters! These will be replicated on the result as getters, not as the computed value.
@@ -27,74 +28,16 @@ The cloning algorithm is pretty smart and is aware of:
 - (Non-)enumerability, (non-)configurability, and/or (non-)writability of object properties! These will be respected.
 - etc.
 
-## Behaviour details
+## Details
 
-Most things work as expected.
-Some notes:
-
-- prototypes: are referenced rather than copied; `clone(Object.create(some_proto)).prototype === some_proto`
+- Mostly works as one would expect!
+- However, the following may be notable:
+- Prototypes: are referenced rather than copied; `Object.is(clone(Object.create(someProto)).prototype, someProto)`
 - `Proxy` objects: do not return other proxies. Additonally, all traps are ignored besides the following:
   - `getPrototypeOf`: given prototype is assigned to new object
   - `ownKeys`: these are the keys that will appear on the clone
   - `getOwnPropertyDescriptor`: is used to define properties on the clone
-
-## Caveats
-
-Where *caveat* means incorrect behaviour due to JS limitations.
-
-- **`Function`, `WeakSet`, `WeakMap`**: Objects of these types will *not* be cloned and will instead be returned as-is.
-
-## Gotchas
-
-Where *gotcha* means behaviour that isn't wrong but may be surprising or undesirable.
-
-<details>
-<summary><b>Monkeypatching methods</b>: cloning an object with monkeypatched methods can cause surprising behaviour if the method has been eagerly bound.</summary>
-
-```js
-const list = ['i', 'am'];
-
-// Monkeypatch .toString() to include brackets
-const old_toString = Array.prototype.toString.bind(list);
-list.toString = () => '[' + old_toString() + ']';
-
-// Works OK
-list.push('error');
-console.assert(list.toString() === '[i,am,error]');
-
-// Now try cloning it
-const { clone } = require('true-clone');
-const cloned = clone(list);
-
-// Oh no!
-cloned.push('room');
-console.assert(cloned.toString() === '[i,am,error]');
-```
-
-The issue is that `cloned.toString` shadows `old_toString` which is still boud to `list`.
-Thus, calling `cloned.toString` will render the contents of `list`, not `cloned`.
-
-The easiest fix for this is to wait for the `this` argument within the moneypatched call, for instance by replacing
-```js
-const old_toString = Array.prototype.toString.bind(list);
-list.toString = () => '[' + old_toString() + ']';
-```
-with
-```js
-list.toString = function() {
-  const old_toString = Array.prototype.toString.bind(this);
-  return '[' + old_toString() + ']';
-}
-```
-or with
-```js
-list.toString = function() {
-  return '[' + Array.prototype.toString.call(this) + ']';
-}
-```
-
-Another fix is to use prototyping instead of monkeypatching.
-</details>
+- Due to JS limitations, objects of the type **`Function`, `WeakSet`,** and **`WeakMap`** will *not* be cloned and will instead be returned as-is.
 
 ## Comparison
 
