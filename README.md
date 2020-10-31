@@ -27,12 +27,6 @@ The cloning algorithm is pretty smart and is aware of:
 - (Non-)enumerability, (non-)configurability, and/or (non-)writability of object properties! These will be respected.
 - etc.
 
-## Versioning
-
-The *official* API for this package is to provide a cloning algorithm with perfect behaviour.
-All imperfect behaviour, even if documented, is *not* a part of the API and should *not* be relied on.
-Updates to this package will thus almost always be either minor- or patch-level updates.
-
 ## Behaviour details
 
 Most things work as expected.
