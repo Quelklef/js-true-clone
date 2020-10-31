@@ -45,7 +45,7 @@ Suite in `tests.js` run on different packages using node v14.2.0. See `compare.s
 
 | package \ feature             | primitives | native types | prototypes | monkeypatching | relations   | rich properites |
 | ----------------------------- | ---------- | ------------ | ---------- | -------------- | ----------- | --------------- |
-| `true-clone` 0.7.9            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
+| `true-clone` 1.0.0            | ![s]       | ![s]         | ![s]       | ![s]           | ![s]        | ![s]            |
 | [`clone`][1] 2.1.2            | ![s]       | ![p] <sup>1  | ![s]       | ![p] <sup>1    | ![s]        | ![u]            |
 | [`lodash.clonedeep`][2] 4.5.0 | ![s]       | ![p] <sup>2  | ![s]       | ![p] <sup>3    | ![p] <sup>4 | ![u]            |
 | [`rfdc`][3] 1.1.4             | ![s]       | ![p] <sup>5  | ![u]       | ![u]           | ![p] <sup>6 | ![u]            |
@@ -93,10 +93,10 @@ See `benchmark.js`.
 
 | package \ scope               | primitives     | native object types | plain objects | arrays |
 | ----------------------------- | -------------- | ------------------- | ------------- | ------ |
-| `true-clone` 0.7.9            | 2.305m [ops/s] | 337k                | 465k          | 1.281m |
-| [`clone`][1] 2.1.2            | 1.943m         | 90k                 | 266k          | 257k   |
-| [`lodash.clonedeep`][2] 4.5.0 | 6.132m         | 227k                | 810k          | 2.086m |
-| [`rfdc`][3] 1.1.4             | 33.599m        | 969k                | 2.480m        | 2.392m |
+| `true-clone` 1.0.0            | 2.300m [ops/s] | 343k                | 440k          | 1.219m |
+| [`clone`][1] 2.1.2            | 1.823m         | 96k                 | 261k          | 263k   |
+| [`lodash.clonedeep`][2] 4.5.0 | 5.791m         | 219k                | 734k          | 1.988m |
+| [`rfdc`][3] 1.1.4             | 32.823m        | 964k                | 2.420m        | 2.346m |
 
 <details>
 <summary>Details</summary>
